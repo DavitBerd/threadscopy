@@ -1,0 +1,105 @@
+.container {
+  display: grid;
+  grid-template-columns: 280px 1fr 350px;
+  min-height: 100vh;
+  background-color: #000;
+  color: #fff;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 80px 1fr 300px;
+  }
+
+  @media (max-width: 992px) {
+    grid-template-columns: 80px 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.main {
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
+  min-height: 100vh;
+  padding: 20px;
+
+  @media (max-width: 768px) {
+    border-left: none;
+    border-right: none;
+  }
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #333;
+  color: #fff;
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+
+.noPosts {
+  padding: 40px 0;
+  text-align: center;
+  color: #888;
+}
+
+.rightSidebar {
+  padding: 20px;
+  border-left: 1px solid #333;
+
+  @media (max-width: 992px) {
+    display: none;
+  }
+}
+
+.authCard {
+  background-color: #121212;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  p {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .authButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+    background-color: transparent;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
