@@ -59,7 +59,6 @@ interface AppState {
   ) => void;
 }
 
-// Type for stored state with ISO string dates
 interface StoredState {
   posts: Array<{
     id: string;
@@ -100,7 +99,6 @@ interface StoredState {
   }>;
 }
 
-// Helper to convert Dates to ISO strings for storage
 const serializeState = (state: AppState): StoredState => {
   return {
     posts: state.posts.map((post) => ({
@@ -118,7 +116,6 @@ const serializeState = (state: AppState): StoredState => {
   };
 };
 
-// Helper to parse ISO strings back to Dates
 const deserializeState = (stored: StoredState): AppState => {
   return {
     posts: stored.posts.map((post) => ({
@@ -133,7 +130,7 @@ const deserializeState = (stored: StoredState): AppState => {
         createdAt: new Date(reply.createdAt),
       })),
     })),
-    addPost: () => {}, // Will be overridden by store
+    addPost: () => {},
     updatePost: () => {},
     addComment: () => {},
     updateComment: () => {},
@@ -142,7 +139,6 @@ const deserializeState = (stored: StoredState): AppState => {
   };
 };
 
-// Default initial state
 const defaultState: AppState = {
   posts: [
     {
@@ -219,8 +215,7 @@ const defaultState: AppState = {
   updateReply: () => {},
 };
 
-export const useStore = create<AppState>((set, get) => {
-  // Load initial state from localStorage
+export const useStore = create<AppState>((set) => {
   let initialState = defaultState;
   if (typeof window !== "undefined") {
     const stored = localStorage.getItem("appState");
