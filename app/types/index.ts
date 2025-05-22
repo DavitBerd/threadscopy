@@ -29,6 +29,7 @@ export type CommentType = {
   repostsCount: number;
   sharesCount: number;
   replies: ReplyType[];
+  parentId: number;
 };
 
 export type ReplyType = {

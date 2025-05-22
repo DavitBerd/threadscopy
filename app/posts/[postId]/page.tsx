@@ -140,6 +140,7 @@ export default function PostPage() {
       repostsCount: 0,
       sharesCount: 0,
       replies: [],
+      parentId: 0,
     };
 
     if (commentId) {
@@ -168,15 +169,21 @@ export default function PostPage() {
     try {
       return formatDistanceToNow(createdAt, { addSuffix: true });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return "Unknown time";
     }
   };
 
-  const Menu = ({ itemId, type }: { itemId: string; type: "post" | "comment" | "reply" }) => {
+  const Menu = ({
+    itemId,
+    type,
+  }: {
+    itemId: string;
+    type: "post" | "comment" | "reply";
+  }) => {
     const handleOptionClick = (option: string) => {
       console.log(`Selected ${option} for ${type} with ID: ${itemId}`);
-      setMenuOpen(null); 
+      setMenuOpen(null);
     };
 
     return (
@@ -201,22 +208,40 @@ export default function PostPage() {
         </button>
         {menuOpen === itemId && (
           <div className={styles.menuDropdown}>
-            <button onClick={() => handleOptionClick("Save")} className={styles.menuItem}>
+            <button
+              onClick={() => handleOptionClick("Save")}
+              className={styles.menuItem}
+            >
               Save
             </button>
-            <button onClick={() => handleOptionClick("Not interested")} className={styles.menuItem}>
+            <button
+              onClick={() => handleOptionClick("Not interested")}
+              className={styles.menuItem}
+            >
               Not interested
             </button>
-            <button onClick={() => handleOptionClick("Mute")} className={styles.menuItem}>
+            <button
+              onClick={() => handleOptionClick("Mute")}
+              className={styles.menuItem}
+            >
               Mute
             </button>
-            <button onClick={() => handleOptionClick("Block")} className={styles.menuItem}>
+            <button
+              onClick={() => handleOptionClick("Block")}
+              className={styles.menuItem}
+            >
               Block
             </button>
-            <button onClick={() => handleOptionClick("Report")} className={styles.menuItem}>
+            <button
+              onClick={() => handleOptionClick("Report")}
+              className={styles.menuItem}
+            >
               Report
             </button>
-            <button onClick={() => handleOptionClick("Copy link")} className={styles.menuItem}>
+            <button
+              onClick={() => handleOptionClick("Copy link")}
+              className={styles.menuItem}
+            >
               Copy link
             </button>
           </div>
@@ -263,7 +288,9 @@ export default function PostPage() {
               width="16"
               height="16"
               viewBox="0 0 24 24"
-              fill={user && comment.likes.includes(user.uid) ? "#f91880" : "none"}
+              fill={
+                user && comment.likes.includes(user.uid) ? "#f91880" : "none"
+              }
               stroke="#888"
               strokeWidth="2"
             >
@@ -399,7 +426,9 @@ export default function PostPage() {
                       height="16"
                       viewBox="0 0 24 24"
                       fill={
-                        user && reply.likes.includes(user.uid) ? "#f91880" : "none"
+                        user && reply.likes.includes(user.uid)
+                          ? "#f91880"
+                          : "none"
                       }
                       stroke="#888"
                       strokeWidth="2"
@@ -467,7 +496,9 @@ export default function PostPage() {
                 </div>
                 {replyingTo === reply.id && user && (
                   <form
-                    onSubmit={handleSubmit((data) => onSubmitComment(data, comment.id))}
+                    onSubmit={handleSubmit((data) =>
+                      onSubmitComment(data, comment.id)
+                    )}
                     className={styles.replyForm}
                   >
                     <div className={styles.replyInputWrapper}>
@@ -603,7 +634,9 @@ export default function PostPage() {
                 width="20"
                 height="20"
                 viewBox="0 0 24 24"
-                fill={user && post.likes.includes(user.uid) ? "#f91880" : "none"}
+                fill={
+                  user && post.likes.includes(user.uid) ? "#f91880" : "none"
+                }
                 stroke="#888"
                 strokeWidth="2"
               >

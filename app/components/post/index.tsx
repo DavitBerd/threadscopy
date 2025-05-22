@@ -58,7 +58,8 @@ const Post = ({ post, user, updatePost }: PostProps) => {
       likes: [],
       repostsCount: 0,
       sharesCount: 0,
-      replies: []
+      replies: [],
+       parentId: 0,
     };
 
     addComment(newComment);
