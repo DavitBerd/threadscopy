@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface PostType {
+type PostType = {
   id: string;
   content: string;
   createdAt: Date;
@@ -11,9 +11,9 @@ interface PostType {
   repostsCount: number;
   sharesCount: number;
   imageUrl?: string;
-}
+};
 
-interface CommentType {
+type CommentType = {
   parentId: number;
   id: string;
   content: string;
@@ -26,9 +26,9 @@ interface CommentType {
   repostsCount: number;
   sharesCount: number;
   replies: ReplyType[];
-}
+};
 
-interface ReplyType {
+type ReplyType = {
   id: string;
   content: string;
   createdAt: Date;
@@ -39,9 +39,9 @@ interface ReplyType {
   likes: string[];
   repostsCount: number;
   sharesCount: number;
-}
+};
 
-interface AppState {
+type AppState = {
   posts: PostType[];
   comments: CommentType[];
   addPost: (post: PostType) => void;
@@ -57,9 +57,9 @@ interface AppState {
     replyId: string,
     updatedFields: Partial<ReplyType>
   ) => void;
-}
+};
 
-interface StoredState {
+type StoredState = {
   posts: Array<{
     id: string;
     content: string;
@@ -97,7 +97,7 @@ interface StoredState {
       sharesCount: number;
     }>;
   }>;
-}
+};
 
 const serializeState = (state: AppState): StoredState => {
   return {

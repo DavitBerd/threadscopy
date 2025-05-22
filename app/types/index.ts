@@ -1,10 +1,10 @@
-export interface UserType {
+export type UserType = {
   uid: string;
   displayName: string | null;
   photoURL: string | null;
-}
+};
 
-export interface PostType {
+export type PostType = {
   id: string;
   content: string;
   createdAt: Date;
@@ -15,9 +15,9 @@ export interface PostType {
   repostsCount: number;
   sharesCount: number;
   imageUrl?: string;
-}
+};
 
-export interface CommentType {
+export type CommentType = {
   id: string;
   content: string;
   createdAt: Date;
@@ -29,9 +29,9 @@ export interface CommentType {
   repostsCount: number;
   sharesCount: number;
   replies: ReplyType[];
-}
+};
 
-export interface ReplyType {
+export type ReplyType = {
   id: string;
   content: string;
   createdAt: Date;
@@ -42,4 +42,4 @@ export interface ReplyType {
   likes: string[];
   repostsCount: number;
   sharesCount: number;
-}
+};
