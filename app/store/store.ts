@@ -60,153 +60,77 @@ type AppState = {
 };
 
 type StoredState = {
-  posts: Array<{
-    id: string;
-    content: string;
+  posts: (Omit<PostType, "createdAt"> & { createdAt: string })[];
+  comments: (Omit<CommentType, "createdAt" | "replies"> & {
     createdAt: string;
-    userId: string;
-    userName: string;
-    userPhotoURL?: string;
-    likes: string[];
-    repostsCount: number;
-    sharesCount: number;
-    imageUrl?: string;
-  }>;
-  comments: Array<{
-    parentId: number;
-    id: string;
-    content: string;
-    createdAt: string;
-    userId: string;
-    userName: string;
-    userPhotoURL?: string;
-    postId: string;
-    likes: string[];
-    repostsCount: number;
-    sharesCount: number;
-    replies: Array<{
-      id: string;
-      content: string;
-      createdAt: string;
-      userId: string;
-      userName: string;
-      userPhotoURL?: string;
-      commentId: string;
-      likes: string[];
-      repostsCount: number;
-      sharesCount: number;
-    }>;
-  }>;
+    replies: (Omit<ReplyType, "createdAt"> & { createdAt: string })[];
+  })[];
 };
 
-const serializeState = (state: AppState): StoredState => {
-  return {
-    posts: state.posts.map((post) => ({
-      ...post,
-      createdAt: post.createdAt.toISOString(),
+const serializeState = (state: AppState): StoredState => ({
+  posts: state.posts.map((post) => ({
+    id: post.id,
+    content: post.content,
+    createdAt: post.createdAt.toISOString(),
+    userId: post.userId,
+    userName: post.userName,
+    userPhotoURL: post.userPhotoURL,
+    likes: post.likes,
+    repostsCount: post.repostsCount,
+    sharesCount: post.sharesCount,
+    imageUrl: post.imageUrl,
+  })),
+  comments: state.comments.map((comment) => ({
+    parentId: comment.parentId,
+    id: comment.id,
+    content: comment.content,
+    createdAt: comment.createdAt.toISOString(),
+    userId: comment.userId,
+    userName: comment.userName,
+    userPhotoURL: comment.userPhotoURL,
+    postId: comment.postId,
+    likes: comment.likes,
+    repostsCount: comment.repostsCount,
+    sharesCount: comment.sharesCount,
+    replies: comment.replies.map((reply) => ({
+      id: reply.id,
+      content: reply.content,
+      createdAt: reply.createdAt.toISOString(),
+      userId: reply.userId,
+      userName: reply.userName,
+      userPhotoURL: reply.userPhotoURL,
+      commentId: reply.commentId,
+      likes: reply.likes,
+      repostsCount: reply.repostsCount,
+      sharesCount: reply.sharesCount,
     })),
-    comments: state.comments.map((comment) => ({
-      ...comment,
-      createdAt: comment.createdAt.toISOString(),
-      replies: comment.replies.map((reply) => ({
-        ...reply,
-        createdAt: reply.createdAt.toISOString(),
-      })),
-    })),
-  };
-};
+  })),
+});
 
-const deserializeState = (stored: StoredState): AppState => {
-  return {
-    posts: stored.posts.map((post) => ({
-      ...post,
-      createdAt: new Date(post.createdAt),
+const deserializeState = (stored: StoredState): AppState => ({
+  posts: stored.posts.map((post) => ({
+    ...post,
+    createdAt: new Date(post.createdAt),
+  })),
+  comments: stored.comments.map((comment) => ({
+    ...comment,
+    createdAt: new Date(comment.createdAt),
+    replies: comment.replies.map((reply) => ({
+      ...reply,
+      createdAt: new Date(reply.createdAt),
     })),
-    comments: stored.comments.map((comment) => ({
-      ...comment,
-      createdAt: new Date(comment.createdAt),
-      replies: comment.replies.map((reply) => ({
-        ...reply,
-        createdAt: new Date(reply.createdAt),
-      })),
-    })),
-    addPost: () => {},
-    updatePost: () => {},
-    addComment: () => {},
-    updateComment: () => {},
-    addReply: () => {},
-    updateReply: () => {},
-  };
-};
+  })),
+  addPost: () => {},
+  updatePost: () => {},
+  addComment: () => {},
+  updateComment: () => {},
+  addReply: () => {},
+  updateReply: () => {},
+});
 
 const defaultState: AppState = {
-  posts: [
-    {
-      id: "placeholder1",
-      content: "Welcome to Threads! This is a sample post to get you started.",
-      createdAt: new Date(),
-      userId: "sampleUser1",
-      userName: "Sample User",
-      userPhotoURL: "",
-      likes: ["mockUser1", "mockUser2"],
-      repostsCount: 0,
-      sharesCount: 0,
-    },
-    {
-      id: "placeholder2",
-      content: "Another example post! Join the conversation.",
-      createdAt: new Date(Date.now() - 3600000),
-      userId: "sampleUser2",
-      userName: "Jane Doe",
-      userPhotoURL: "",
-      likes: ["mockUser3"],
-      repostsCount: 2,
-      sharesCount: 1,
-    },
-  ],
-  comments: [
-    {
-      id: "comment1",
-      content: "Great post!",
-      createdAt: new Date(),
-      userId: "mockUser1",
-      userName: "Commenter One",
-      userPhotoURL: undefined,
-      postId: "placeholder1",
-      likes: ["mockUser2"],
-      repostsCount: 0,
-      sharesCount: 0,
-      replies: [
-        {
-          id: "reply1",
-          content: "Totally agree!",
-          createdAt: new Date(),
-          userId: "mockUser3",
-          userName: "Replier One",
-          userPhotoURL: undefined,
-          commentId: "comment1",
-          likes: [],
-          repostsCount: 0,
-          sharesCount: 0,
-        },
-      ],
-      parentId: 1234,
-    },
-    {
-      id: "comment2",
-      content: "Nice one!",
-      createdAt: new Date(),
-      userId: "mockUser2",
-      userName: "Commenter Two",
-      userPhotoURL: undefined,
-      postId: "placeholder2",
-      likes: [],
-      repostsCount: 0,
-      sharesCount: 0,
-      replies: [],
-      parentId: 123,
-    },
-  ],
+  posts: [],
+  comments: [],
   addPost: () => {},
   updatePost: () => {},
   addComment: () => {},
@@ -217,14 +141,15 @@ const defaultState: AppState = {
 
 export const useStore = create<AppState>((set) => {
   let initialState = defaultState;
+
   if (typeof window !== "undefined") {
     const stored = localStorage.getItem("appState");
     if (stored) {
       try {
         const parsed: StoredState = JSON.parse(stored);
         initialState = deserializeState(parsed);
-      } catch (error) {
-        console.error("Error parsing localStorage state:", error);
+      } catch (err) {
+        console.error("Failed to parse localStorage state", err);
       }
     }
   }
@@ -234,8 +159,8 @@ export const useStore = create<AppState>((set) => {
     addPost: (post) =>
       set((state) => {
         const newState = {
+          ...state,
           posts: [post, ...state.posts],
-          comments: state.comments,
         };
         localStorage.setItem(
           "appState",
@@ -246,10 +171,10 @@ export const useStore = create<AppState>((set) => {
     updatePost: (postId, updatedFields) =>
       set((state) => {
         const newState = {
+          ...state,
           posts: state.posts.map((post) =>
             post.id === postId ? { ...post, ...updatedFields } : post
           ),
-          comments: state.comments,
         };
         localStorage.setItem(
           "appState",
@@ -260,7 +185,7 @@ export const useStore = create<AppState>((set) => {
     addComment: (comment) =>
       set((state) => {
         const newState = {
-          posts: state.posts,
+          ...state,
           comments: [comment, ...state.comments],
         };
         localStorage.setItem(
@@ -272,7 +197,7 @@ export const useStore = create<AppState>((set) => {
     updateComment: (commentId, updatedFields) =>
       set((state) => {
         const newState = {
-          posts: state.posts,
+          ...state,
           comments: state.comments.map((comment) =>
             comment.id === commentId
               ? { ...comment, ...updatedFields }
@@ -288,7 +213,7 @@ export const useStore = create<AppState>((set) => {
     addReply: (reply) =>
       set((state) => {
         const newState = {
-          posts: state.posts,
+          ...state,
           comments: state.comments.map((comment) =>
             comment.id === reply.commentId
               ? { ...comment, replies: [reply, ...comment.replies] }
@@ -304,7 +229,7 @@ export const useStore = create<AppState>((set) => {
     updateReply: (commentId, replyId, updatedFields) =>
       set((state) => {
         const newState = {
-          posts: state.posts,
+          ...state,
           comments: state.comments.map((comment) =>
             comment.id === commentId
               ? {
