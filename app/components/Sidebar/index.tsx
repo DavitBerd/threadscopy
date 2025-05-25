@@ -1,4 +1,3 @@
-
 "use client";
 import { useState, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -605,5 +604,3 @@ const Sidebar = ({ user }: SidebarProps) => {
 };
 
 export default Sidebar;
-
-

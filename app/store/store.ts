@@ -1,44 +1,13 @@
 import { create } from "zustand";
+import { PostType, CommentType, ReplyType } from "../types/index";
 
-type PostType = {
-  id: string;
-  content: string;
-  createdAt: Date;
-  userId: string;
-  userName: string;
-  userPhotoURL?: string;
-  likes: string[];
-  repostsCount: number;
-  sharesCount: number;
-  imageUrl?: string;
-};
-
-type CommentType = {
-  parentId: number;
-  id: string;
-  content: string;
-  createdAt: Date;
-  userId: string;
-  userName: string;
-  userPhotoURL?: string;
-  postId: string;
-  likes: string[];
-  repostsCount: number;
-  sharesCount: number;
-  replies: ReplyType[];
-};
-
-type ReplyType = {
-  id: string;
-  content: string;
-  createdAt: Date;
-  userId: string;
-  userName: string;
-  userPhotoURL?: string;
-  commentId: string;
-  likes: string[];
-  repostsCount: number;
-  sharesCount: number;
+// Type for serialized state in localStorage
+type StoredState = {
+  posts: (Omit<PostType, "createdAt"> & { createdAt: string })[];
+  comments: (Omit<CommentType, "createdAt" | "replies"> & {
+    createdAt: string;
+    replies: (Omit<ReplyType, "createdAt"> & { createdAt: string })[];
+  })[];
 };
 
 type AppState = {
@@ -59,98 +28,73 @@ type AppState = {
   ) => void;
 };
 
-type StoredState = {
-  posts: (Omit<PostType, "createdAt"> & { createdAt: string })[];
-  comments: (Omit<CommentType, "createdAt" | "replies"> & {
-    createdAt: string;
-    replies: (Omit<ReplyType, "createdAt"> & { createdAt: string })[];
-  })[];
-};
-
-const serializeState = (state: AppState): StoredState => ({
-  posts: state.posts.map((post) => ({
-    id: post.id,
-    content: post.content,
-    createdAt: post.createdAt.toISOString(),
-    userId: post.userId,
-    userName: post.userName,
-    userPhotoURL: post.userPhotoURL,
-    likes: post.likes,
-    repostsCount: post.repostsCount,
-    sharesCount: post.sharesCount,
-    imageUrl: post.imageUrl,
-  })),
-  comments: state.comments.map((comment) => ({
-    parentId: comment.parentId,
-    id: comment.id,
-    content: comment.content,
-    createdAt: comment.createdAt.toISOString(),
-    userId: comment.userId,
-    userName: comment.userName,
-    userPhotoURL: comment.userPhotoURL,
-    postId: comment.postId,
-    likes: comment.likes,
-    repostsCount: comment.repostsCount,
-    sharesCount: comment.sharesCount,
-    replies: comment.replies.map((reply) => ({
-      id: reply.id,
-      content: reply.content,
-      createdAt: reply.createdAt.toISOString(),
-      userId: reply.userId,
-      userName: reply.userName,
-      userPhotoURL: reply.userPhotoURL,
-      commentId: reply.commentId,
-      likes: reply.likes,
-      repostsCount: reply.repostsCount,
-      sharesCount: reply.sharesCount,
-    })),
-  })),
-});
-
-const deserializeState = (stored: StoredState): AppState => ({
-  posts: stored.posts.map((post) => ({
-    ...post,
-    createdAt: new Date(post.createdAt),
-  })),
-  comments: stored.comments.map((comment) => ({
-    ...comment,
-    createdAt: new Date(comment.createdAt),
-    replies: comment.replies.map((reply) => ({
-      ...reply,
-      createdAt: new Date(reply.createdAt),
-    })),
-  })),
-  addPost: () => {},
-  updatePost: () => {},
-  addComment: () => {},
-  updateComment: () => {},
-  addReply: () => {},
-  updateReply: () => {},
-});
-
-const defaultState: AppState = {
-  posts: [],
-  comments: [],
-  addPost: () => {},
-  updatePost: () => {},
-  addComment: () => {},
-  updateComment: () => {},
-  addReply: () => {},
-  updateReply: () => {},
-};
+// Placeholder posts to initialize the store
+const placeholderPosts: PostType[] = [
+  {
+    id: `post-${crypto.randomUUID()}`,
+    content: "Welcome to Threads! This is a sample post.",
+    createdAt: new Date(),
+    userId: "placeholder-user",
+    userName: "Threads Team",
+    userPhotoURL: "/images/placeholder-user.png",
+    likes: [],
+    repostsCount: 0,
+    sharesCount: 0,
+    imageUrl: undefined,
+  },
+  {
+    id: `post-${crypto.randomUUID()}`,
+    content: "Check out this cool photo!",
+    createdAt: new Date(),
+    userId: "placeholder-user",
+    userName: "Threads Team",
+    userPhotoURL: "/images/placeholder-user.png",
+    likes: [],
+    repostsCount: 0,
+    sharesCount: 0,
+    imageUrl: "/images/placeholder-image.jpg",
+  },
+];
 
 export const useStore = create<AppState>((set) => {
-  let initialState = defaultState;
+  // Initialize state from localStorage or use placeholder posts
+  let initialState: AppState = {
+    posts: [],
+    comments: [],
+    addPost: () => {},
+    updatePost: () => {},
+    addComment: () => {},
+    updateComment: () => {},
+    addReply: () => {},
+    updateReply: () => {},
+  };
 
   if (typeof window !== "undefined") {
     const stored = localStorage.getItem("appState");
     if (stored) {
       try {
         const parsed: StoredState = JSON.parse(stored);
-        initialState = deserializeState(parsed);
+        initialState = {
+          ...initialState,
+          posts: parsed.posts.map((post) => ({
+            ...post,
+            createdAt: new Date(post.createdAt),
+          })),
+          comments: parsed.comments.map((comment) => ({
+            ...comment,
+            createdAt: new Date(comment.createdAt),
+            replies: comment.replies.map((reply) => ({
+              ...reply,
+              createdAt: new Date(reply.createdAt),
+            })),
+          })),
+        };
       } catch (err) {
         console.error("Failed to parse localStorage state", err);
       }
+    } else {
+      // If no stored state, initialize with placeholder posts
+      initialState.posts = placeholderPosts;
     }
   }
 
@@ -158,13 +102,23 @@ export const useStore = create<AppState>((set) => {
     ...initialState,
     addPost: (post) =>
       set((state) => {
-        const newState = {
-          ...state,
-          posts: [post, ...state.posts],
-        };
+        const newState = { ...state, posts: [post, ...state.posts] };
         localStorage.setItem(
           "appState",
-          JSON.stringify(serializeState(newState))
+          JSON.stringify({
+            posts: newState.posts.map((p) => ({
+              ...p,
+              createdAt: p.createdAt.toISOString(),
+            })),
+            comments: newState.comments.map((c) => ({
+              ...c,
+              createdAt: c.createdAt.toISOString(),
+              replies: c.replies.map((r) => ({
+                ...r,
+                createdAt: r.createdAt.toISOString(),
+              })),
+            })),
+          })
         );
         return newState;
       }),
@@ -178,19 +132,42 @@ export const useStore = create<AppState>((set) => {
         };
         localStorage.setItem(
           "appState",
-          JSON.stringify(serializeState(newState))
+          JSON.stringify({
+            posts: newState.posts.map((p) => ({
+              ...p,
+              createdAt: p.createdAt.toISOString(),
+            })),
+            comments: newState.comments.map((c) => ({
+              ...c,
+              createdAt: c.createdAt.toISOString(),
+              replies: c.replies.map((r) => ({
+                ...r,
+                createdAt: r.createdAt.toISOString(),
+              })),
+            })),
+          })
         );
         return newState;
       }),
     addComment: (comment) =>
       set((state) => {
-        const newState = {
-          ...state,
-          comments: [comment, ...state.comments],
-        };
+        const newState = { ...state, comments: [comment, ...state.comments] };
         localStorage.setItem(
           "appState",
-          JSON.stringify(serializeState(newState))
+          JSON.stringify({
+            posts: newState.posts.map((p) => ({
+              ...p,
+              createdAt: p.createdAt.toISOString(),
+            })),
+            comments: newState.comments.map((c) => ({
+              ...c,
+              createdAt: c.createdAt.toISOString(),
+              replies: c.replies.map((r) => ({
+                ...r,
+                createdAt: r.createdAt.toISOString(),
+              })),
+            })),
+          })
         );
         return newState;
       }),
@@ -206,7 +183,20 @@ export const useStore = create<AppState>((set) => {
         };
         localStorage.setItem(
           "appState",
-          JSON.stringify(serializeState(newState))
+          JSON.stringify({
+            posts: newState.posts.map((p) => ({
+              ...p,
+              createdAt: p.createdAt.toISOString(),
+            })),
+            comments: newState.comments.map((c) => ({
+              ...c,
+              createdAt: c.createdAt.toISOString(),
+              replies: c.replies.map((r) => ({
+                ...r,
+                createdAt: r.createdAt.toISOString(),
+              })),
+            })),
+          })
         );
         return newState;
       }),
@@ -222,7 +212,20 @@ export const useStore = create<AppState>((set) => {
         };
         localStorage.setItem(
           "appState",
-          JSON.stringify(serializeState(newState))
+          JSON.stringify({
+            posts: newState.posts.map((p) => ({
+              ...p,
+              createdAt: p.createdAt.toISOString(),
+            })),
+            comments: newState.comments.map((c) => ({
+              ...c,
+              createdAt: c.createdAt.toISOString(),
+              replies: c.replies.map((r) => ({
+                ...r,
+                createdAt: r.createdAt.toISOString(),
+              })),
+            })),
+          })
         );
         return newState;
       }),
@@ -245,7 +248,20 @@ export const useStore = create<AppState>((set) => {
         };
         localStorage.setItem(
           "appState",
-          JSON.stringify(serializeState(newState))
+          JSON.stringify({
+            posts: newState.posts.map((p) => ({
+              ...p,
+              createdAt: p.createdAt.toISOString(),
+            })),
+            comments: newState.comments.map((c) => ({
+              ...c,
+              createdAt: c.createdAt.toISOString(),
+              replies: c.replies.map((r) => ({
+                ...r,
+                createdAt: r.createdAt.toISOString(),
+              })),
+            })),
+          })
         );
         return newState;
       }),
