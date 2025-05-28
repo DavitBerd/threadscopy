@@ -11,7 +11,9 @@ import styles from "./Postpage.module.scss";
 import { useStore } from "@/app/store/store";
 import { auth } from "@/app/firebase/config";
 import Sidebar from "@/app/components/Sidebar";
+
 import { UserType, CommentType, ReplyType } from "../../types";
+import DropdownMenu from "@/app/components/dropdownmenu";
 
 interface CommentFormData {
   comment: string;
@@ -21,7 +23,14 @@ export default function PostPage() {
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [menuOpen, setMenuOpen] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
+    null
+  );
+  const [deletingReplyId, setDeletingReplyId] = useState<{
+    commentId: string;
+    replyId: string;
+  } | null>(null);
   const {
     posts,
     comments,
@@ -30,6 +39,9 @@ export default function PostPage() {
     updateComment,
     addReply,
     updateReply,
+    deletePost,
+    deleteComment,
+    deleteReply,
   } = useStore();
   const { register, handleSubmit, reset } = useForm<CommentFormData>();
   const router = useRouter();
@@ -69,6 +81,12 @@ export default function PostPage() {
   const handleSharePost = () => {
     if (!user || !post) return;
     updatePost(post.id, { sharesCount: post.sharesCount + 1 });
+  };
+
+  const handleDeletePost = () => {
+    if (!post) return;
+    deletePost(post.id);
+    router.push("/");
   };
 
   const handleLikeComment = (commentId: string) => {
@@ -125,39 +143,61 @@ export default function PostPage() {
     updateReply(commentId, replyId, { sharesCount: reply.sharesCount + 1 });
   };
 
+  const handleDeleteComment = () => {
+    if (!deletingCommentId) return;
+    deleteComment(deletingCommentId);
+    setDeletingCommentId(null);
+  };
+
+  const handleDeleteReply = () => {
+    if (!deletingReplyId) return;
+    deleteReply(deletingReplyId.commentId, deletingReplyId.replyId);
+    setDeletingReplyId(null);
+  };
+
   const onSubmitComment = (data: CommentFormData, commentId?: string) => {
     if (!user || !post) return;
 
-    const newComment: CommentType = {
-      id: `comment-${Date.now()}`,
-      content: data.comment,
-      createdAt: new Date(),
-      userId: user.uid,
-      userName: user.displayName || "Anonymous User",
-      userPhotoURL: user.photoURL || undefined,
-      postId: post.id,
-      likes: [],
-      repostsCount: 0,
-      sharesCount: 0,
-      replies: [],
-      parentId: 0,
-    };
-
     if (commentId) {
+      const replyingToComment = comments.find((c) => c.id === commentId);
+      const replyingToReply = comments
+        .flatMap((c) => c.replies)
+        .find((r) => r.id === commentId);
+      const targetUserName = replyingToReply
+        ? replyingToReply.userName
+        : replyingToComment?.userName || "";
+      const parentCommentId = replyingToReply
+        ? replyingToReply.commentId
+        : commentId;
+
       const newReply: ReplyType = {
         id: `reply-${Date.now()}`,
-        content: data.comment,
+        content: `@${targetUserName} ${data.comment}`,
         createdAt: new Date(),
         userId: user.uid,
         userName: user.displayName || "Anonymous User",
         userPhotoURL: user.photoURL || undefined,
-        commentId,
+        commentId: parentCommentId,
         likes: [],
         repostsCount: 0,
         sharesCount: 0,
       };
       addReply(newReply);
     } else {
+      const newComment: CommentType = {
+        id: `comment-${Date.now()}`,
+        content: data.comment,
+        createdAt: new Date(),
+        userId: user.uid,
+        userName: user.displayName || "Anonymous User",
+        userPhotoURL: user.photoURL || undefined,
+        postId: post.id,
+        likes: [],
+        repostsCount: 0,
+        sharesCount: 0,
+        replies: [],
+        parentId: 0,
+      };
       addComment(newComment);
     }
 
@@ -174,106 +214,49 @@ export default function PostPage() {
     }
   };
 
-  const Menu = ({
-    itemId,
-    type,
-  }: {
-    itemId: string;
-    type: "post" | "comment" | "reply";
-  }) => {
-    const handleOptionClick = (option: string) => {
-      console.log(`Selected ${option} for ${type} with ID: ${itemId}`);
-      setMenuOpen(null);
-    };
-
-    return (
-      <div className={styles.menuContainer}>
-        <button
-          className={styles.menuButton}
-          onClick={() => setMenuOpen(menuOpen === itemId ? null : itemId)}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#888"
-            strokeWidth="2"
-          >
-            <circle cx="12" cy="12" r="1"></circle>
-            <circle cx="12" cy="6" r="1"></circle>
-            <circle cx="12" cy="18" r="1"></circle>
-          </svg>
-        </button>
-        {menuOpen === itemId && (
-          <div className={styles.menuDropdown}>
-            <button
-              onClick={() => handleOptionClick("Save")}
-              className={styles.menuItem}
-            >
-              Save
-            </button>
-            <button
-              onClick={() => handleOptionClick("Not interested")}
-              className={styles.menuItem}
-            >
-              Not interested
-            </button>
-            <button
-              onClick={() => handleOptionClick("Mute")}
-              className={styles.menuItem}
-            >
-              Mute
-            </button>
-            <button
-              onClick={() => handleOptionClick("Block")}
-              className={styles.menuItem}
-            >
-              Block
-            </button>
-            <button
-              onClick={() => handleOptionClick("Report")}
-              className={styles.menuItem}
-            >
-              Report
-            </button>
-            <button
-              onClick={() => handleOptionClick("Copy link")}
-              className={styles.menuItem}
-            >
-              Copy link
-            </button>
-          </div>
-        )}
-      </div>
-    );
+  const getReplyToUsername = (id: string) => {
+    const comment = comments.find((c) => c.id === id);
+    if (comment) return comment.userName;
+    const reply = comments.flatMap((c) => c.replies).find((r) => r.id === id);
+    return reply ? reply.userName : "";
   };
 
   const renderComments = (commentsToRender: CommentType[]) => {
     return commentsToRender.map((comment) => (
       <div key={comment.id} className={styles.comment}>
         <div className={styles.commentHeader}>
-          {comment.userPhotoURL ? (
-            <Image
-              src={comment.userPhotoURL}
-              alt={comment.userName}
-              width={30}
-              height={30}
-              className={styles.commentAvatar}
-            />
-          ) : (
-            <div className={styles.defaultCommentAvatar}>
-              {comment.userName.charAt(0)}
-            </div>
-          )}
-          <div className={styles.commentInfo}>
-            <div className={styles.commentUserName}>{comment.userName}</div>
-            <div className={styles.commentTime}>
-              {getFormattedDate(comment.createdAt)}
+          <div className={styles.commentInfoWrapper}>
+            {comment.userPhotoURL ? (
+              <Image
+                src={comment.userPhotoURL}
+                alt={comment.userName}
+                width={30}
+                height={30}
+                className={styles.commentAvatar}
+              />
+            ) : (
+              <div className={styles.defaultCommentAvatar}>
+                {comment.userName.charAt(0)}
+              </div>
+            )}
+            <div className={styles.commentInfo}>
+              <div className={styles.commentUserName}>{comment.userName}</div>
+              <div className={styles.commentTime}>
+                {getFormattedDate(comment.createdAt)}
+              </div>
             </div>
           </div>
-          <Menu itemId={comment.id} type="comment" />
+          <DropdownMenu
+            itemId={comment.id}
+            type="comment"
+            isOwner={user ? comment.userId === user.uid : false}
+            onDelete={() => setDeletingCommentId(comment.id)}
+            onOptionClick={(option) =>
+              console.log(
+                `Selected ${option} for comment with ID: ${comment.id}`
+              )
+            }
+          />
         </div>
         <div className={styles.commentContent}>{comment.content}</div>
         <div className={styles.commentActions}>
@@ -376,7 +359,7 @@ export default function PostPage() {
               )}
               <input
                 type="text"
-                placeholder={`Reply to ${comment.userName}...`}
+                placeholder={`@${comment.userName} `}
                 {...register("comment", { required: true })}
                 className={styles.replyInput}
               />
@@ -388,147 +371,177 @@ export default function PostPage() {
         )}
         {comment.replies.length > 0 && (
           <div className={styles.replies}>
-            {comment.replies.map((reply) => (
-              <div key={reply.id} className={styles.reply}>
-                <div className={styles.replyHeader}>
-                  {reply.userPhotoURL ? (
-                    <Image
-                      src={reply.userPhotoURL}
-                      alt={reply.userName}
-                      width={24}
-                      height={24}
-                      className={styles.replyAvatar}
-                    />
-                  ) : (
-                    <div className={styles.defaultReplyAvatar}>
-                      {reply.userName.charAt(0)}
-                    </div>
-                  )}
-                  <div className={styles.replyInfo}>
-                    <div className={styles.replyUserName}>{reply.userName}</div>
-                    <div className={styles.replyTime}>
-                      {getFormattedDate(reply.createdAt)}
-                    </div>
-                  </div>
-                  <Menu itemId={reply.id} type="reply" />
-                </div>
-                <div className={styles.replyContent}>{reply.content}</div>
-                <div className={styles.replyActions}>
-                  <button
-                    className={`${styles.actionButton} ${
-                      user && reply.likes.includes(user.uid) ? styles.liked : ""
-                    }`}
-                    onClick={() => handleLikeReply(comment.id, reply.id)}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill={
-                        user && reply.likes.includes(user.uid)
-                          ? "#f91880"
-                          : "none"
-                      }
-                      stroke="#888"
-                      strokeWidth="2"
-                    >
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                    <span>{reply.likes.length}</span>
-                  </button>
-                  <button
-                    className={styles.actionButton}
-                    onClick={() => setReplyingTo(reply.id)}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#888"
-                      strokeWidth="2"
-                    >
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    <span>0</span>
-                  </button>
-                  <button
-                    className={styles.actionButton}
-                    onClick={() => handleRepostReply(comment.id, reply.id)}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#888"
-                      strokeWidth="2"
-                    >
-                      <path d="M17 1l4 4-4 4"></path>
-                      <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-                      <path d="M7 23l-4-4 4-4"></path>
-                      <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-                    </svg>
-                    <span>{reply.repostsCount}</span>
-                  </button>
-                  <button
-                    className={styles.actionButton}
-                    onClick={() => handleShareReply(comment.id, reply.id)}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#888"
-                      strokeWidth="2"
-                    >
-                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                      <polyline points="16 6 12 2 8 6"></polyline>
-                      <line x1="12" y1="2" x2="12" y2="15"></line>
-                    </svg>
-                    <span>{reply.sharesCount}</span>
-                  </button>
-                </div>
-                {replyingTo === reply.id && user && (
-                  <form
-                    onSubmit={handleSubmit((data) =>
-                      onSubmitComment(data, comment.id)
-                    )}
-                    className={styles.replyForm}
-                  >
-                    <div className={styles.replyInputWrapper}>
-                      {user.photoURL ? (
+            {[...comment.replies]
+              .sort(
+                (a, b) =>
+                  new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime()
+              )
+              .map((reply) => (
+                <div key={reply.id} className={styles.reply}>
+                  <div className={styles.replyHeader}>
+                    <div className={styles.replyInfoWrapper}>
+      
+                      {reply.userPhotoURL ? (
                         <Image
-                          src={user.photoURL}
-                          alt={user.displayName || "User"}
+                          src={reply.userPhotoURL}
+                          alt={reply.userName}
                           width={24}
                           height={24}
                           className={styles.replyAvatar}
                         />
                       ) : (
                         <div className={styles.defaultReplyAvatar}>
-                          {user.displayName ? user.displayName.charAt(0) : "U"}
+                          {reply.userName.charAt(0)}
                         </div>
                       )}
-                      <input
-                        type="text"
-                        placeholder={`Reply to ${reply.userName}...`}
-                        {...register("comment", { required: true })}
-                        className={styles.replyInput}
-                      />
-                      <button type="submit" className={styles.replySubmit}>
-                        Reply
-                      </button>
+                      <div className={styles.replyInfo}>
+                        <div className={styles.replyUserName}>
+                          {reply.userName}
+                        </div>
+                        <div className={styles.replyTime}>
+                          {getFormattedDate(reply.createdAt)}
+                        </div>
+                      </div>
                     </div>
-                  </form>
-                )}
-              </div>
-            ))}
+                    <DropdownMenu
+                      itemId={reply.id}
+                      type="reply"
+                      isOwner={user ? reply.userId === user.uid : false}
+                      onDelete={() =>
+                        setDeletingReplyId({
+                          commentId: comment.id,
+                          replyId: reply.id,
+                        })
+                      }
+                      onOptionClick={(option) =>
+                        console.log(
+                          `Selected ${option} for reply with ID: ${reply.id}`
+                        )
+                      }
+                    />
+                  </div>
+                  <div className={styles.replyContent}>{reply.content}</div>
+                  <div className={styles.replyActions}>
+                    <button
+                      className={`${styles.actionButton} ${
+                        user && reply.likes.includes(user.uid)
+                          ? styles.liked
+                          : ""
+                      }`}
+                      onClick={() => handleLikeReply(comment.id, reply.id)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill={
+                          user && reply.likes.includes(user.uid)
+                            ? "#f91880"
+                            : "none"
+                        }
+                        stroke="#888"
+                        strokeWidth="2"
+                      >
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                      </svg>
+                      <span>{reply.likes.length}</span>
+                    </button>
+                    <button
+                      className={styles.actionButton}
+                      onClick={() => setReplyingTo(reply.id)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#888"
+                        strokeWidth="2"
+                      >
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                      <span>0</span>
+                    </button>
+                    <button
+                      className={styles.actionButton}
+                      onClick={() => handleRepostReply(comment.id, reply.id)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#888"
+                        strokeWidth="2"
+                      >
+                        <path d="M17 1l4 4-4 4"></path>
+                        <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                        <path d="M7 23l-4-4 4-4"></path>
+                        <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                      </svg>
+                      <span>{reply.repostsCount}</span>
+                    </button>
+                    <button
+                      className={styles.actionButton}
+                      onClick={() => handleShareReply(comment.id, reply.id)}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#888"
+                        strokeWidth="2"
+                      >
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                        <polyline points="16 6 12 2 8 6"></polyline>
+                        <line x1="12" y1="2" x2="12" y2="15"></line>
+                      </svg>
+                      <span>{reply.sharesCount}</span>
+                    </button>
+                  </div>
+                  {replyingTo === reply.id && user && (
+                    <form
+                      onSubmit={handleSubmit((data) =>
+                        onSubmitComment(data, reply.id)
+                      )}
+                      className={styles.replyForm}
+                    >
+                      <div className={styles.replyInputWrapper}>
+                        {user.photoURL ? (
+                          <Image
+                            src={user.photoURL}
+                            alt={user.displayName || "User"}
+                            width={24}
+                            height={24}
+                            className={styles.replyAvatar}
+                          />
+                        ) : (
+                          <div className={styles.defaultReplyAvatar}>
+                            {user.displayName
+                              ? user.displayName.charAt(0)
+                              : "U"}
+                          </div>
+                        )}
+                        <input
+                          type="text"
+                          placeholder={`@${getReplyToUsername(reply.id)} `}
+                          {...register("comment", { required: true })}
+                          className={styles.replyInput}
+                        />
+                        <button type="submit" className={styles.replySubmit}>
+                          Reply
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              ))}
           </div>
         )}
       </div>
@@ -559,6 +572,87 @@ export default function PostPage() {
 
   return (
     <div className={styles.container}>
+      {showDeleteModal && (
+        <div className={styles.deleteModalOverlay}>
+          <div className={styles.deleteModalContent}>
+            <div className={styles.deleteModalHeader}>
+              <h3>Confirm Delete</h3>
+            </div>
+            <div className={styles.deleteModalBody}>
+              Are you sure you want to delete this post? This action cannot be
+              undone.
+            </div>
+            <div className={styles.deleteModalFooter}>
+              <button
+                className={styles.deleteCancelButton}
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.deleteConfirmButton}
+                onClick={handleDeletePost}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deletingCommentId && (
+        <div className={styles.deleteModalOverlay}>
+          <div className={styles.deleteModalContent}>
+            <div className={styles.deleteModalHeader}>
+              <h3>Confirm Delete</h3>
+            </div>
+            <div className={styles.deleteModalBody}>
+              Are you sure you want to delete this comment? This action cannot
+              be undone.
+            </div>
+            <div className={styles.deleteModalFooter}>
+              <button
+                className={styles.deleteCancelButton}
+                onClick={() => setDeletingCommentId(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.deleteConfirmButton}
+                onClick={handleDeleteComment}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deletingReplyId && (
+        <div className={styles.deleteModalOverlay}>
+          <div className={styles.deleteModalContent}>
+            <div className={styles.deleteModalHeader}>
+              <h3>Confirm Delete</h3>
+            </div>
+            <div className={styles.deleteModalBody}>
+              Are you sure you want to delete this reply? This action cannot be
+              undone.
+            </div>
+            <div className={styles.deleteModalFooter}>
+              <button
+                className={styles.deleteCancelButton}
+                onClick={() => setDeletingReplyId(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.deleteConfirmButton}
+                onClick={handleDeleteReply}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <Sidebar user={user} />
 
       <main className={styles.main}>
@@ -578,7 +672,6 @@ export default function PostPage() {
             </svg>
             Back
           </Link>
-          <h1 className={styles.title}>Post</h1>
         </div>
 
         <div className={styles.post}>
@@ -604,7 +697,15 @@ export default function PostPage() {
                 </div>
               </div>
             </div>
-            <Menu itemId={post.id} type="post" />
+            <DropdownMenu
+              itemId={post.id}
+              type="post"
+              isOwner={user ? post.userId === user.uid : false}
+              onDelete={() => setShowDeleteModal(true)}
+              onOptionClick={(option) =>
+                console.log(`Selected ${option} for post with ID: ${post.id}`)
+              }
+            />
           </div>
 
           <div className={styles.postContent}>{post.content}</div>
@@ -719,8 +820,6 @@ export default function PostPage() {
                     <Image
                       src={user.photoURL}
                       alt={user.displayName || "User"}
-                      width={32}
-                      height={32}
                       className={styles.commentAvatar}
                     />
                   ) : (

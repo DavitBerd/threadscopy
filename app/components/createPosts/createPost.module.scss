@@ -3,272 +3,291 @@
   background-color: #121212;
   border-radius: 12px;
   margin-bottom: 20px;
-}
-
-.postTrigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
-  cursor: pointer;
-  border-bottom: 1px solid #333;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.avatar {
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.defaultAvatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.triggerText {
-  color: #888;
-  font-size: 16px;
-  flex: 1;
-  padding-left: 12px;
-}
-
-.postButton {
-  background-color: #333;
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #fff;
-    color: black;
-  }
-}
-
-.modalOverlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 1000;
-  padding: 20px;
-}
 
-.modalContent {
-  background-color: #1a1a1a;
-  border-radius: 16px;
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow: hidden;
-  border: 1px solid #333;
-}
+  .postTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    cursor: pointer;
+    border-bottom: 1px solid #333;
 
-.modalHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-  border-bottom: 1px solid #333;
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
 
-  h3 {
-    margin: 0;
-    color: #fff;
-    font-size: 18px;
-    font-weight: 600;
-    flex: 1;
-    text-align: center;
-  }
-}
+      .avatar {
+        border-radius: 50%;
+        object-fit: cover;
+      }
 
-.closeButton {
-  background: none;
-  border: none;
-  color: #777;
-  cursor: pointer;
-  font-size: 18px;
-  padding: 4px;
-  border-radius: 4px;
-  transition: all 0.2s;
+      .defaultAvatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #fff;
+        flex-shrink: 0;
+      }
 
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
-  }
-}
+      .triggerText {
+        color: #888;
+        font-size: 16px;
+        flex: 1;
+        padding-left: 12px;
+      }
+    }
 
-.postContent {
-  padding: 20px;
-  max-height: 60vh;
-  overflow-y: auto;
-}
+    .postButton {
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
 
-.userInfo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.userName {
-  color: #fff;
-  font-weight: 600;
-}
-
-.postForm {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.textarea {
-  width: 100%;
-  min-height: 120px;
-  padding: 12px 0;
-  border: none;
-  background: none;
-  color: #fff;
-  resize: none;
-  font-size: 16px;
-  font-family: inherit;
-  outline: none;
-
-  &::placeholder {
-    color: #777;
-  }
-}
-
-.error {
-  color: #ff4757;
-  font-size: 14px;
-  margin-top: 8px;
-}
-
-.imagePreview {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  margin: 16px 0;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.removeImage {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 14px;
-  z-index: 1;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.9);
-  }
-}
-
-.previewImage {
-  border-radius: 12px;
-}
-
-.postActions {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #333;
-}
-
-.fileInput {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  color: #777;
-  transition: color 0.2s;
-
-  &:hover {
-    color: #fff;
+      &:hover {
+        background-color: #fff;
+        color: black;
+      }
+    }
   }
 
-  svg {
-    width: 20px;
-    height: 20px;
-  }
+  .modalOverlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
 
-  span {
-    font-size: 14px;
-  }
-}
+    .modalContent {
+      background-color: #1a1a1a;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow: hidden;
+      border: 1px solid #333;
 
-.modalFooter {
-  display: flex;
-  gap: 12px;
-  padding: 20px;
-  border-top: 1px solid #333;
-}
+      .modalHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        border-bottom: 1px solid #333;
 
-.cancelButton {
-  flex: 1;
-  padding: 12px;
-  border-radius: 8px;
-  background-color: transparent;
-  border: 1px solid #333;
-  color: #fff;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
+        h3 {
+          margin: 0;
+          color: #fff;
+          font-size: 18px;
+          font-weight: 600;
+          flex: 1;
+          text-align: center;
+        }
 
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-}
+        .closeButton {
+          background: none;
+          border: none;
+          color: #777;
+          cursor: pointer;
+          font-size: 18px;
+          padding: 4px;
+          border-radius: 4px;
+          transition: all 0.2s;
 
-.submitButton {
-  flex: 1;
-  padding: 12px;
-  border-radius: 8px;
-  background-color: #007bff;
-  border: none;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+          }
+        }
+      }
 
-  &:hover:not(:disabled) {
-    background-color: #0056b3;
-  }
+      .postForm {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
 
-  &:disabled {
-    background-color: #333;
-    cursor: not-allowed;
-    opacity: 0.6;
+        .postContent {
+          padding: 20px;
+          max-height: 60vh;
+          overflow-y: auto;
+
+          .userInfo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+
+            .avatar {
+              border-radius: 50%;
+              object-fit: cover;
+            }
+
+            .defaultAvatar {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              background-color: #333;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 600;
+              color: #fff;
+              flex-shrink: 0;
+            }
+
+            .userName {
+              color: #fff;
+              font-weight: 600;
+            }
+          }
+
+          .textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px 0;
+            border: none;
+            background: none;
+            color: #fff;
+            resize: none;
+            font-size: 16px;
+            font-family: inherit;
+            outline: none;
+
+            &::placeholder {
+              color: #777;
+            }
+          }
+
+          .error {
+            color: #ff4757;
+            font-size: 14px;
+            margin-top: 8px;
+          }
+
+          .imagePreview {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            margin: 16px 0;
+            border-radius: 12px;
+            overflow: hidden;
+
+            .removeImage {
+              position: absolute;
+              top: 8px;
+              right: 8px;
+              background: rgba(0, 0, 0, 0.8);
+              color: #fff;
+              border: none;
+              border-radius: 50%;
+              width: 28px;
+              height: 28px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              font-size: 14px;
+              z-index: 1;
+              transition: background-color 0.2s;
+
+              &:hover {
+                background: rgba(0, 0, 0, 0.9);
+              }
+            }
+
+            .previewImage {
+              border-radius: 12px;
+            }
+          }
+
+          .postActions {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #333;
+
+            .fileInput {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              cursor: pointer;
+              color: #777;
+              transition: color 0.2s;
+
+              &:hover {
+                color: #fff;
+              }
+
+              svg {
+                width: 20px;
+                height: 20px;
+              }
+
+              span {
+                font-size: 14px;
+              }
+            }
+          }
+        }
+
+        .modalFooter {
+          display: flex;
+          gap: 12px;
+          padding: 20px;
+          border-top: 1px solid #333;
+
+          .cancelButton {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: transparent;
+            border: 1px solid #333;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+              background-color: rgba(255, 255, 255, 0.05);
+            }
+          }
+
+          .submitButton {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: white;
+            border: none;
+            color: black;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+
+            &:hover:not(:disabled) {
+              background-color: #c9c9c9;
+            }
+
+            &:disabled {
+              background-color: #333;
+              cursor: not-allowed;
+              opacity: 0.6;
+            }
+          }
+        }
+      }
+    }
   }
 }

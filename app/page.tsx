@@ -25,42 +25,46 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={styles.container}>
-      <Sidebar user={user} />
-      <main className={styles.main}>
-        <h1 className={styles.title}>Home</h1>
-        {user && <CreatePost user={user} />}
-        <div className={styles.posts}>
-          {loading ? (
-            <div className={styles.loading}>Loading...</div>
-          ) : posts.length > 0 ? (
-            posts.map((post) => (
-              <Post
-                key={post.id}
-                post={post}
-                user={user}
-                updatePost={updatePost}
-              />
-            ))
-          ) : (
-            <div className={styles.noPosts}>No posts available</div>
+    <>
+      <div className={styles.wrapper}>
+        <Sidebar user={user} />
+        <div className={styles.container}>
+          <main className={styles.main}>
+            <h1 className={styles.title}>Home</h1>
+            {user && <CreatePost user={user} />}
+            <div className={styles.posts}>
+              {loading ? (
+                <div className={styles.loading}>Loading...</div>
+              ) : posts.length > 0 ? (
+                posts.map((post) => (
+                  <Post
+                    key={post.id}
+                    post={post}
+                    user={user}
+                    updatePost={updatePost}
+                  />
+                ))
+              ) : (
+                <div className={styles.noPosts}>No posts available</div>
+              )}
+            </div>
+          </main>
+          {!user && (
+            <div className={styles.rightSidebar}>
+              <div className={styles.authCard}>
+                <h2>Sign in or register for Threads</h2>
+                <p>Join the conversation!</p>
+                <button
+                  className={styles.authButton}
+                  onClick={() => router.push("/pages/login")}
+                >
+                  Sign in
+                </button>
+              </div>
+            </div>
           )}
         </div>
-      </main>
-      {!user && (
-        <div className={styles.rightSidebar}>
-          <div className={styles.authCard}>
-            <h2>Sign in or register for Threads</h2>
-            <p>Join the conversation!</p>
-            <button
-              className={styles.authButton}
-              onClick={() => router.push("/pages/login")}
-            >
-              Sign in
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

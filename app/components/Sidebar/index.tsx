@@ -5,19 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "firebase/auth";
 import { useForm } from "react-hook-form";
-
 import styles from "./Sidebar.module.scss";
 import { auth } from "@/app/firebase/config";
 import { UserType, PostType } from "../../types";
 import { useStore } from "../../store/store";
-
-interface SidebarProps {
+type SidebarProps = {
   user: UserType | null;
-}
+};
 
-interface FormData {
+type FormData = {
   content: string;
-}
+};
 
 const Sidebar = ({ user }: SidebarProps) => {
   const [showBottomMenu, setShowBottomMenu] = useState(false);
@@ -106,12 +104,12 @@ const Sidebar = ({ user }: SidebarProps) => {
 
   return (
     <>
-
       <div className={styles.sidebar}>
         <div className={styles.logo}>
-          <Link href="/">Threads</Link>
+          <Link href="/" className={styles.sidelogo}>
+            Threads
+          </Link>
         </div>
-
         <nav className={styles.nav}>
           <Link
             href="/"
@@ -131,7 +129,6 @@ const Sidebar = ({ user }: SidebarProps) => {
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
           </Link>
-
           <Link
             href="/"
             className={`${styles.navItem} ${
@@ -150,7 +147,6 @@ const Sidebar = ({ user }: SidebarProps) => {
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
           </Link>
-
           <button
             className={styles.navItem}
             onClick={() => handleProtectedAction("post")}
@@ -167,7 +163,6 @@ const Sidebar = ({ user }: SidebarProps) => {
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
           </button>
-
           <button
             className={`${styles.navItem} ${
               pathname === "/notifications" ? styles.active : ""
@@ -185,7 +180,6 @@ const Sidebar = ({ user }: SidebarProps) => {
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </button>
-
           <button
             className={`${styles.navItem} ${
               pathname.startsWith("/profile") ? styles.active : ""
@@ -207,7 +201,6 @@ const Sidebar = ({ user }: SidebarProps) => {
             )}
           </button>
         </nav>
-
         <div className={styles.bottomSection}>
           <button
             className={styles.menuButton}
@@ -228,8 +221,6 @@ const Sidebar = ({ user }: SidebarProps) => {
           </button>
         </div>
       </div>
-
-
       <div className={styles.topBar}>
         <div className={styles.logo}>
           <Link href="/">Threads</Link>
@@ -243,7 +234,6 @@ const Sidebar = ({ user }: SidebarProps) => {
           </button>
         )}
       </div>
-
       <nav className={styles.bottomNav}>
         <Link
           href="/"
@@ -263,7 +253,6 @@ const Sidebar = ({ user }: SidebarProps) => {
             <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
         </Link>
-
         <Link
           href="/"
           className={`${styles.navItem} ${
@@ -282,7 +271,6 @@ const Sidebar = ({ user }: SidebarProps) => {
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </Link>
-
         <button
           className={styles.navItem}
           onClick={() => handleProtectedAction("post")}
@@ -299,7 +287,6 @@ const Sidebar = ({ user }: SidebarProps) => {
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
-
         <button
           className={`${styles.navItem} ${
             pathname === "/notifications" ? styles.active : ""
@@ -317,7 +304,6 @@ const Sidebar = ({ user }: SidebarProps) => {
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
         </button>
-
         <button
           className={`${styles.navItem} ${
             pathname.startsWith("/profile") ? styles.active : ""
@@ -338,7 +324,6 @@ const Sidebar = ({ user }: SidebarProps) => {
             </div>
           )}
         </button>
-
         <button
           className={styles.navItem}
           onClick={() => setShowBottomMenu(!showBottomMenu)}
@@ -357,7 +342,6 @@ const Sidebar = ({ user }: SidebarProps) => {
           </svg>
         </button>
       </nav>
-
       {showBottomMenu && (
         <div
           className={styles.bottomMenuOverlay}
@@ -380,35 +364,27 @@ const Sidebar = ({ user }: SidebarProps) => {
                 <path d="M9 18l6-6-6-6" />
               </svg>
             </div>
-
             {user && (
               <>
                 <div className={styles.menuItem}>
                   <span>Insights</span>
                 </div>
-
                 <div className={styles.menuItem}>
                   <span>Settings</span>
                 </div>
-
                 <div className={styles.menuDivider}></div>
-
                 <div className={styles.menuItem}>
                   <span>Saved</span>
                 </div>
-
                 <div className={styles.menuItem}>
                   <span>Liked</span>
                 </div>
-
                 <div className={styles.menuDivider}></div>
               </>
             )}
-
             <div className={styles.menuItem}>
               <span>Report a problem</span>
             </div>
-
             {user && (
               <button className={styles.logoutMenuItem} onClick={handleLogout}>
                 <span>Log out</span>
@@ -417,7 +393,6 @@ const Sidebar = ({ user }: SidebarProps) => {
           </div>
         </div>
       )}
-
       {showLoginPrompt && (
         <div className={styles.modalOverlay}>
           <div className={styles.loginPromptContent}>
@@ -427,11 +402,12 @@ const Sidebar = ({ user }: SidebarProps) => {
             >
               ✕
             </button>
-
             <div className={styles.loginPromptBody}>
               <h2>Say more with Threads</h2>
-              <p>Join Threads to share thoughts, find out what&#39;s going on, follow your people and more.</p>
-
+              <p>
+                Join Threads to share thoughts, find out what&#39;s going on,
+                follow your people and more.
+              </p>
               <div className={styles.loginOptions}>
                 <button
                   className={styles.instagramLogin}
@@ -443,22 +419,64 @@ const Sidebar = ({ user }: SidebarProps) => {
                   <div className={styles.instagramIcon}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <defs>
-                        <linearGradient id="instagram-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <linearGradient
+                          id="instagram-gradient"
+                          x1="0%"
+                          y1="0%"
+                          x2="100%"
+                          y2="100%"
+                        >
                           <stop offset="0%" stopColor="#833ab4" />
                           <stop offset="50%" stopColor="#fd1d1d" />
                           <stop offset="100%" stopColor="#fcb045" />
                         </linearGradient>
                       </defs>
-                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="url(#instagram-gradient)" strokeWidth="2" fill="none"/>
-                      <circle cx="12" cy="12" r="3" stroke="url(#instagram-gradient)" strokeWidth="2" fill="none"/>
-                      <circle cx="17.5" cy="6.5" r="1.5" fill="url(#instagram-gradient)"/>
+                      <rect
+                        x="2"
+                        y="2"
+                        width="20"
+                        height="20"
+                        rx="5"
+                        ry="5"
+                        stroke="url(#instagram-gradient)"
+                        strokeWidth="2"
+                        fill="none"
+                      />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="3"
+                        stroke="url(#instagram-gradient)"
+                        strokeWidth="2"
+                        fill="none"
+                      />
+                      <circle
+                        cx="17.5"
+                        cy="6.5"
+                        r="1.5"
+                        fill="url(#instagram-gradient)"
+                      />
                     </svg>
                   </div>
                   <div className={styles.loginText}>
-                    <span className={styles.loginLabel}>Continue with Instagram</span>
+                    <span className={styles.loginLabel}>
+                      Continue with Instagram
+                    </span>
                   </div>
-                  <svg className={styles.arrowIcon} width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg
+                    className={styles.arrowIcon}
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      d="M9 18l6-6-6-6"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </button>
               </div>
@@ -466,7 +484,6 @@ const Sidebar = ({ user }: SidebarProps) => {
           </div>
         </div>
       )}
-
       {showPostModal && user && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
@@ -488,7 +505,6 @@ const Sidebar = ({ user }: SidebarProps) => {
                 </button>
                 <h3>New Post</h3>
               </div>
-
               <div className={styles.postContent}>
                 <div className={styles.userInfo}>
                   {user?.photoURL ? (
@@ -508,17 +524,14 @@ const Sidebar = ({ user }: SidebarProps) => {
                     {user?.displayName || "Anonymous User"}
                   </span>
                 </div>
-
                 <textarea
                   placeholder="What's new?"
                   className={styles.textarea}
                   {...register("content", { required: !previewUrl })}
                 />
-
                 {errors.content && !previewUrl && (
                   <p className={styles.error}>Please add text or an image</p>
                 )}
-
                 {previewUrl && (
                   <div className={styles.imagePreview}>
                     <button
@@ -537,7 +550,6 @@ const Sidebar = ({ user }: SidebarProps) => {
                     />
                   </div>
                 )}
-
                 <div className={styles.postActions}>
                   <label className={styles.fileInput}>
                     <svg
@@ -571,7 +583,6 @@ const Sidebar = ({ user }: SidebarProps) => {
                   </label>
                 </div>
               </div>
-
               <div className={styles.modalFooter}>
                 <button
                   type="button"
@@ -602,5 +613,4 @@ const Sidebar = ({ user }: SidebarProps) => {
     </>
   );
 };
-
 export default Sidebar;

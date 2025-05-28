@@ -6,13 +6,13 @@ import styles from "./createPost.module.scss";
 import { useStore } from "../../store/store";
 import { UserType, PostType } from "../../types";
 
-interface CreatePostProps {
+type CreatePostProps = {
   user: UserType | null;
-}
+};
 
-interface FormData {
+type FormData = {
   content: string;
-}
+};
 
 const CreatePost = ({ user }: CreatePostProps) => {
   const [showModal, setShowModal] = useState(false);

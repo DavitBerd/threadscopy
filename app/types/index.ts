@@ -1,3 +1,5 @@
+import { StaticImageData } from "next/image";
+
 export type UserType = {
   uid: string;
   displayName: string | null;
@@ -14,7 +16,8 @@ export type PostType = {
   likes: string[];
   repostsCount: number;
   sharesCount: number;
-  imageUrl?: string;
+  imageUrl?: string | StaticImageData;
+  comments?: CommentType[];
 };
 
 export type CommentType = {
