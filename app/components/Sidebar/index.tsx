@@ -1,38 +1,27 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "firebase/auth";
-import { useForm } from "react-hook-form";
 import styles from "./Sidebar.module.scss";
 import { auth } from "@/app/firebase/config";
-import { UserType, PostType } from "../../types";
+import { UserType } from "../../types";
 import { useStore } from "../../store/store";
+import PostCreationWindow from "../postCreationWindow";
+
+
 type SidebarProps = {
   user: UserType | null;
-};
-
-type FormData = {
-  content: string;
 };
 
 const Sidebar = ({ user }: SidebarProps) => {
   const [showBottomMenu, setShowBottomMenu] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { addPost } = useStore();
   const router = useRouter();
   const pathname = usePathname();
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>();
 
   const handleLogout = async () => {
     try {
@@ -41,49 +30,6 @@ const Sidebar = ({ user }: SidebarProps) => {
       router.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
-    }
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewUrl(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const onSubmit = async (data: FormData) => {
-    if ((!data.content.trim() && !previewUrl) || !user) return;
-
-    const newPost: PostType = {
-      id: `post-${crypto.randomUUID()}`,
-      content: data.content,
-      imageUrl: previewUrl || undefined,
-      createdAt: new Date(),
-      userId: user.uid,
-      userName: user.displayName || "Anonymous User",
-      userPhotoURL: user.photoURL || undefined,
-      likes: [],
-      repostsCount: 0,
-      sharesCount: 0,
-    };
-
-    addPost(newPost);
-    reset();
-    setPreviewUrl(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-    setShowPostModal(false);
-  };
-
-  const handleRemoveImage = () => {
-    setPreviewUrl(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
     }
   };
 
@@ -394,7 +340,7 @@ const Sidebar = ({ user }: SidebarProps) => {
         </div>
       )}
       {showLoginPrompt && (
-        <div className={styles.modalOverlay}>
+        <div className={styles.loginPromptOverlay}>
           <div className={styles.loginPromptContent}>
             <button
               className={styles.loginCloseButton}
@@ -405,7 +351,7 @@ const Sidebar = ({ user }: SidebarProps) => {
             <div className={styles.loginPromptBody}>
               <h2>Say more with Threads</h2>
               <p>
-                Join Threads to share thoughts, find out what&#39;s going on,
+                Join Threads to share thoughts, find out what&lsquo;s going on,
                 follow your people and more.
               </p>
               <div className={styles.loginOptions}>
@@ -484,133 +430,14 @@ const Sidebar = ({ user }: SidebarProps) => {
           </div>
         </div>
       )}
-      {showPostModal && user && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <form onSubmit={handleSubmit(onSubmit)} className={styles.postForm}>
-              <div className={styles.modalHeader}>
-                <button
-                  type="button"
-                  className={styles.closeButton}
-                  onClick={() => {
-                    setShowPostModal(false);
-                    setPreviewUrl(null);
-                    reset();
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = "";
-                    }
-                  }}
-                >
-                  ✕
-                </button>
-                <h3>New Post</h3>
-              </div>
-              <div className={styles.postContent}>
-                <div className={styles.userInfo}>
-                  {user?.photoURL ? (
-                    <Image
-                      src={user.photoURL}
-                      alt={user.displayName || "User"}
-                      width={40}
-                      height={40}
-                      className={styles.avatar}
-                    />
-                  ) : (
-                    <div className={styles.defaultAvatar}>
-                      {user?.displayName ? user.displayName.charAt(0) : "U"}
-                    </div>
-                  )}
-                  <span className={styles.userName}>
-                    {user?.displayName || "Anonymous User"}
-                  </span>
-                </div>
-                <textarea
-                  placeholder="What's new?"
-                  className={styles.textarea}
-                  {...register("content", { required: !previewUrl })}
-                />
-                {errors.content && !previewUrl && (
-                  <p className={styles.error}>Please add text or an image</p>
-                )}
-                {previewUrl && (
-                  <div className={styles.imagePreview}>
-                    <button
-                      type="button"
-                      className={styles.removeImage}
-                      onClick={handleRemoveImage}
-                    >
-                      ✕
-                    </button>
-                    <Image
-                      src={previewUrl}
-                      alt="Preview"
-                      layout="fill"
-                      objectFit="cover"
-                      className={styles.previewImage}
-                    />
-                  </div>
-                )}
-                <div className={styles.postActions}>
-                  <label className={styles.fileInput}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <rect
-                        x="3"
-                        y="3"
-                        width="18"
-                        height="18"
-                        rx="2"
-                        ry="2"
-                      ></rect>
-                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                      <polyline points="21 15 16 10 5 21"></polyline>
-                    </svg>
-                    <span>Add photo</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      ref={fileInputRef}
-                      onChange={handleImageChange}
-                      hidden
-                    />
-                  </label>
-                </div>
-              </div>
-              <div className={styles.modalFooter}>
-                <button
-                  type="button"
-                  className={styles.cancelButton}
-                  onClick={() => {
-                    setShowPostModal(false);
-                    setPreviewUrl(null);
-                    reset();
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = "";
-                    }
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className={styles.submitButton}
-                  disabled={!previewUrl && !register("content").name}
-                >
-                  Post
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <PostCreationWindow
+        user={user}
+        showModal={showPostModal}
+        setShowModal={setShowPostModal}
+        addPost={addPost}
+      />
     </>
   );
 };
+
 export default Sidebar;
