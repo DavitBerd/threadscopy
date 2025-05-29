@@ -69,10 +69,9 @@ const Login = () => {
         </form>
 
         <div className={styles.divider}>--or--</div>
-
-        <button className={styles.instagramButton}>
-          <Link href="/pages/register"> Continue with Instagram</Link>
-        </button>
+        <Link href="/pages/register" className={styles.instagramButton}>
+          Continue with Instagram
+        </Link>
       </div>
       <footer className={styles.footer}>
         <p>
