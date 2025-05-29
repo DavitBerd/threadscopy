@@ -47,7 +47,7 @@ const Sidebar = ({ user }: SidebarProps) => {
       router.push(`/`);
     }
   };
-
+console.log(showBottomMenu)
   return (
     <>
       <div className={styles.sidebar}>
