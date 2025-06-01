@@ -183,10 +183,10 @@ const Sidebar = ({ user }: SidebarProps) => {
             setShowPostModal(true);
             break;
           case "notifications":
-            await router.push("/notifications");
+            await router.push("/");
             break;
           case "profile":
-            await router.push(`/profile/${user.uid || user.displayName}`);
+            await router.push(`/`);
             break;
           default:
             break;

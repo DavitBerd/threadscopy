@@ -13,7 +13,7 @@ import { useStore } from "@/app/store/store";
 import { auth } from "@/app/firebase/config";
 import Sidebar from "@/app/components/Sidebar";
 
-import { UserType, CommentType, ReplyType } from "../../types";
+import { UserType, CommentType, ReplyType } from "../../../types";
 import DropdownMenu from "@/app/components/dropdownmenu";
 
 interface CommentFormData {

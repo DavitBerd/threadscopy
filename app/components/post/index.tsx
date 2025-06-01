@@ -174,7 +174,7 @@ const Post = ({ post, user, updatePost }: PostProps) => {
           />
         </div>
 
-        <Link href={`/posts/${post.id}`} className={styles.postLink}>
+        <Link href={`/pages/posts/${post.id}`} className={styles.postLink}>
           {isEditing ? (
             <form
               onSubmit={handleSubmitEdit(onSubmitEdit)}
