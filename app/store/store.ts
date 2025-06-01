@@ -5,14 +5,16 @@ import img2 from "../../public/imgs/istockphoto-649889910-612x612.jpg";
 import img3 from "../../public/imgs/pexels-photo-3076899.jpeg";
 
 type AppState = {
+
   posts: PostType[];
   comments: CommentType[];
-  followedUsers: string[]; // Add this to track followed users
+  followedUsers: string[];
   openDropdownId: string | null;
   addPost: (post: PostType) => void;
   updatePost: (postId: string, updatedFields: Partial<PostType>) => void;
   deletePost: (postId: string) => void;
   addComment: (comment: CommentType) => void;
+  
   updateComment: (
     commentId: string,
     updatedFields: Partial<CommentType>
@@ -27,7 +29,7 @@ type AppState = {
   deleteReply: (commentId: string, replyId: string) => void;
   openDropdown: (itemId: string) => void;
   closeDropdown: () => void;
-  // Add follow/unfollow functions
+
   followUser: (userName: string) => void;
   unfollowUser: (userName: string) => void;
   isFollowing: (userName: string) => boolean;
@@ -445,7 +447,6 @@ export const useStore = create<AppState>((set, get) => {
     ...initialState,
     openDropdownId: null,
 
-    // Follow/unfollow functions
     followUser: (userName) =>
       set((state) => {
         const newFollowedUsers = [...state.followedUsers, userName];

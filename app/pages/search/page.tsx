@@ -2,16 +2,12 @@
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import styles from "./SearchPage.module.scss";
-import { UserType } from "../../types";
 import { useStore } from "@/app/store/store";
 
-type SearchPageProps = {
-  user: UserType | null;
-};
-
-const SearchPage = ({ user }: SearchPageProps) => {
+const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { followUser, unfollowUser, isFollowing } = useStore();
+
   const [suggestions] = useState([
     {
       id: 1,
@@ -51,7 +47,7 @@ const SearchPage = ({ user }: SearchPageProps) => {
 
   return (
     <div className={styles.wrapper}>
-      <Sidebar user={user} />
+      <Sidebar user={null} />
       <div className={styles.container}>
         <main className={styles.main}>
           <div className={styles.searchHeader}>
