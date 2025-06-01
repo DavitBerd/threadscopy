@@ -63,3 +63,14 @@
     background-color: #eaeaea;
   }
 }
+
+.loginLink {
+  margin-top: 12px;
+  font-size: 13px;
+  a {
+    color: #999;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

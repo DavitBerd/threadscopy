@@ -10,6 +10,7 @@ export type PostType = {
   id: string;
   content: string;
   createdAt: Date;
+  updatedAt?: Date;
   userId: string;
   userName: string;
   userPhotoURL?: string;
@@ -24,6 +25,7 @@ export type CommentType = {
   id: string;
   content: string;
   createdAt: Date;
+  updatedAt?: Date;
   userId: string;
   userName: string;
   userPhotoURL?: string;
@@ -39,6 +41,7 @@ export type ReplyType = {
   id: string;
   content: string;
   createdAt: Date;
+  updatedAt?: Date;
   userId: string;
   userName: string;
   userPhotoURL?: string;

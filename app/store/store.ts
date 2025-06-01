@@ -3,9 +3,11 @@ import { PostType, CommentType, ReplyType } from "../types";
 import img1 from "../../public/imgs/240_F_125645329_Pc6Rn1soUuAZyHgp4DYxXKUXITSFCc1R.jpg";
 import img2 from "../../public/imgs/istockphoto-649889910-612x612.jpg";
 import img3 from "../../public/imgs/pexels-photo-3076899.jpeg";
+
 type AppState = {
   posts: PostType[];
   comments: CommentType[];
+  followedUsers: string[]; // Add this to track followed users
   openDropdownId: string | null;
   addPost: (post: PostType) => void;
   updatePost: (postId: string, updatedFields: Partial<PostType>) => void;
@@ -25,6 +27,10 @@ type AppState = {
   deleteReply: (commentId: string, replyId: string) => void;
   openDropdown: (itemId: string) => void;
   closeDropdown: () => void;
+  // Add follow/unfollow functions
+  followUser: (userName: string) => void;
+  unfollowUser: (userName: string) => void;
+  isFollowing: (userName: string) => boolean;
 };
 
 const placeholderPosts: PostType[] = [
@@ -321,7 +327,9 @@ const placeholderComments: CommentType[] = placeholderPosts.flatMap(
   (post) => post.comments || []
 );
 
-const saveToStorage = (state: Pick<AppState, "posts" | "comments">) => {
+const saveToStorage = (
+  state: Pick<AppState, "posts" | "comments" | "followedUsers">
+) => {
   if (typeof window === "undefined") return;
 
   try {
@@ -348,6 +356,7 @@ const saveToStorage = (state: Pick<AppState, "posts" | "comments">) => {
             createdAt: r.createdAt.toISOString(),
           })),
         })),
+        followedUsers: state.followedUsers,
       })
     );
   } catch (err) {
@@ -355,14 +364,21 @@ const saveToStorage = (state: Pick<AppState, "posts" | "comments">) => {
   }
 };
 
-const loadFromStorage = (): Pick<AppState, "posts" | "comments"> => {
+const loadFromStorage = (): Pick<
+  AppState,
+  "posts" | "comments" | "followedUsers"
+> => {
   if (typeof window === "undefined") {
-    return { posts: [], comments: [] };
+    return { posts: [], comments: [], followedUsers: [] };
   }
 
   const stored = localStorage.getItem("appState");
   if (!stored) {
-    return { posts: placeholderPosts, comments: placeholderComments };
+    return {
+      posts: placeholderPosts,
+      comments: placeholderComments,
+      followedUsers: [],
+    };
   }
 
   try {
@@ -410,19 +426,47 @@ const loadFromStorage = (): Pick<AppState, "posts" | "comments"> => {
               })) || [],
           })
         ) || [],
+      followedUsers: parsed.followedUsers || [],
     };
   } catch (err) {
     console.error("Failed to parse localStorage state", err);
-    return { posts: placeholderPosts, comments: placeholderComments };
+    return {
+      posts: placeholderPosts,
+      comments: placeholderComments,
+      followedUsers: [],
+    };
   }
 };
 
-export const useStore = create<AppState>((set) => {
+export const useStore = create<AppState>((set, get) => {
   const initialState = loadFromStorage();
 
   return {
     ...initialState,
     openDropdownId: null,
+
+    // Follow/unfollow functions
+    followUser: (userName) =>
+      set((state) => {
+        const newFollowedUsers = [...state.followedUsers, userName];
+        const newState = { ...state, followedUsers: newFollowedUsers };
+        saveToStorage(newState);
+        return newState;
+      }),
+
+    unfollowUser: (userName) =>
+      set((state) => {
+        const newFollowedUsers = state.followedUsers.filter(
+          (name) => name !== userName
+        );
+        const newState = { ...state, followedUsers: newFollowedUsers };
+        saveToStorage(newState);
+        return newState;
+      }),
+
+    isFollowing: (userName) => {
+      return get().followedUsers.includes(userName);
+    },
 
     addPost: (post) =>
       set((state) => {

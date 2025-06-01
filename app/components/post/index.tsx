@@ -20,11 +20,23 @@ type CommentFormData = {
   comment: string;
 };
 
+type EditFormData = {
+  content: string;
+};
+
 const Post = ({ post, user, updatePost }: PostProps) => {
   const { comments, addComment, deletePost } = useStore();
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const { register, handleSubmit, reset } = useForm<CommentFormData>();
+  const {
+    register: registerEdit,
+    handleSubmit: handleSubmitEdit,
+    reset: resetEdit,
+  } = useForm<EditFormData>({
+    defaultValues: { content: post.content },
+  });
   const isLiked = user ? post.likes.includes(user.uid) : false;
   const postComments = comments.filter((c) => c.postId === post.id);
 
@@ -49,6 +61,23 @@ const Post = ({ post, user, updatePost }: PostProps) => {
   const handleDelete = () => {
     deletePost(post.id);
     setShowDeleteModal(false);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const onSubmitEdit = (data: EditFormData) => {
+    updatePost(post.id, { content: data.content, updatedAt: new Date() });
+    setIsEditing(false);
+    resetEdit();
+  };
+
+  const onCancelEdit = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsEditing(false);
+    resetEdit();
   };
 
   const onSubmitComment = (data: CommentFormData) => {
@@ -138,6 +167,7 @@ const Post = ({ post, user, updatePost }: PostProps) => {
             type="post"
             isOwner={user ? post.userId === user.uid : false}
             onDelete={() => setShowDeleteModal(true)}
+            onEdit={handleEdit}
             onOptionClick={(option) =>
               console.log(`Selected ${option} for post with ID: ${post.id}`)
             }
@@ -145,7 +175,32 @@ const Post = ({ post, user, updatePost }: PostProps) => {
         </div>
 
         <Link href={`/posts/${post.id}`} className={styles.postLink}>
-          <div className={styles.postContent}>{post.content}</div>
+          {isEditing ? (
+            <form
+              onSubmit={handleSubmitEdit(onSubmitEdit)}
+              className={styles.editForm}
+            >
+              <textarea
+                {...registerEdit("content", { required: true })}
+                className={styles.editInput}
+                defaultValue={post.content}
+              />
+              <div className={styles.editButtons}>
+                <button type="submit" className={styles.editSubmit}>
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={onCancelEdit}
+                  className={styles.editCancel}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className={styles.postContent}>{post.content}</div>
+          )}
           {post.imageUrl && (
             <div className={styles.postImage}>
               <Image
@@ -256,5 +311,4 @@ const Post = ({ post, user, updatePost }: PostProps) => {
     </div>
   );
 };
-
 export default Post;

@@ -1,0 +1,129 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.content {
+  background: #0d0d0d;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  position: relative;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+  padding: 32px 24px;
+
+  &.errorVariant .body h2 {
+    color: #f87171;
+  }
+
+  &.successVariant {
+    border: 1px solid #34d399;
+
+    .body h2 {
+      color: #34d399;
+    }
+  }
+
+  &.registerVariant .body h2 {
+    color: #818cf8;
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: color 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    color: #f3f4f6;
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.body {
+  text-align: center;
+
+  h2 {
+    margin-bottom: 12px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #e5e7eb;
+  }
+
+  p {
+    color: #9ca3af;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1a1a1a;
+  padding: 14px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+
+  &:hover {
+    background: #111;
+    transform: translateY(-1px);
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonText {
+  flex: 1;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  color: #e5e7eb;
+}
+
+.arrowIcon {
+  color: #6b7280;
+}
+
+.simpleButton {
+  width: 100%;
+  padding: 14px 24px;
+  background: #1f2937;
+  color: #f9fafb;
+  border: none;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #111827;
+  }
+}

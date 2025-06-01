@@ -1,3 +1,4 @@
+
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -19,18 +20,26 @@ interface CommentFormData {
   comment: string;
 }
 
+interface EditFormData {
+  content: string;
+}
+
 export default function PostPage() {
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
-    null
-  );
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
   const [deletingReplyId, setDeletingReplyId] = useState<{
     commentId: string;
     replyId: string;
   } | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingReplyId, setEditingReplyId] = useState<{
+    commentId: string;
+    replyId: string;
+  } | null>(null);
+  const [isEditingPost, setIsEditingPost] = useState(false);
   const {
     posts,
     comments,
@@ -44,6 +53,7 @@ export default function PostPage() {
     deleteReply,
   } = useStore();
   const { register, handleSubmit, reset } = useForm<CommentFormData>();
+  const { register: registerEdit, handleSubmit: handleSubmitEdit, reset: resetEdit } = useForm<EditFormData>();
   const router = useRouter();
   const { postId } = useParams();
 
@@ -87,6 +97,23 @@ export default function PostPage() {
     if (!post) return;
     deletePost(post.id);
     router.push("/");
+  };
+
+  const handleEditPost = () => {
+    setIsEditingPost(true);
+    resetEdit({ content: post?.content });
+  };
+
+  const onSubmitEditPost = (data: EditFormData) => {
+    if (!post) return;
+    updatePost(post.id, { content: data.content, updatedAt: new Date() });
+    setIsEditingPost(false);
+    resetEdit();
+  };
+
+  const onCancelEditPost = () => {
+    setIsEditingPost(false);
+    resetEdit();
   };
 
   const handleLikeComment = (commentId: string) => {
@@ -153,6 +180,51 @@ export default function PostPage() {
     if (!deletingReplyId) return;
     deleteReply(deletingReplyId.commentId, deletingReplyId.replyId);
     setDeletingReplyId(null);
+  };
+
+  const handleEditComment = (commentId: string) => {
+    setEditingCommentId(commentId);
+    const comment = comments.find((c) => c.id === commentId);
+    if (comment) {
+      resetEdit({ content: comment.content });
+    }
+  };
+
+  const handleEditReply = (commentId: string, replyId: string) => {
+    setEditingReplyId({ commentId, replyId });
+    const reply = comments
+      .find((c) => c.id === commentId)
+      ?.replies.find((r) => r.id === replyId);
+    if (reply) {
+      resetEdit({ content: reply.content });
+    }
+  };
+
+  const onSubmitEditComment = (data: EditFormData) => {
+    if (!editingCommentId) return;
+    updateComment(editingCommentId, { content: data.content, updatedAt: new Date() });
+    setEditingCommentId(null);
+    resetEdit();
+  };
+
+  const onSubmitEditReply = (data: EditFormData) => {
+    if (!editingReplyId) return;
+    updateReply(editingReplyId.commentId, editingReplyId.replyId, {
+      content: data.content,
+      updatedAt: new Date(),
+    });
+    setEditingReplyId(null);
+    resetEdit();
+  };
+
+  const onCancelEditComment = () => {
+    setEditingCommentId(null);
+    resetEdit();
+  };
+
+  const onCancelEditReply = () => {
+    setEditingReplyId(null);
+    resetEdit();
   };
 
   const onSubmitComment = (data: CommentFormData, commentId?: string) => {
@@ -251,6 +323,7 @@ export default function PostPage() {
             type="comment"
             isOwner={user ? comment.userId === user.uid : false}
             onDelete={() => setDeletingCommentId(comment.id)}
+            onEdit={() => handleEditComment(comment.id)}
             onOptionClick={(option) =>
               console.log(
                 `Selected ${option} for comment with ID: ${comment.id}`
@@ -258,7 +331,21 @@ export default function PostPage() {
             }
           />
         </div>
-        <div className={styles.commentContent}>{comment.content}</div>
+        {editingCommentId === comment.id ? (
+          <form onSubmit={handleSubmitEdit(onSubmitEditComment)} className={styles.editForm}>
+            <textarea
+              {...registerEdit("content", { required: true })}
+              className={styles.editInput}
+              defaultValue={comment.content}
+            />
+            <div className={styles.editButtons}>
+              <button type="submit" className={styles.editSubmit}>Save</button>
+              <button type="button" onClick={onCancelEditComment} className={styles.editCancel}>Cancel</button>
+            </div>
+          </form>
+        ) : (
+          <div className={styles.commentContent}>{comment.content}</div>
+        )}
         <div className={styles.commentActions}>
           <button
             className={`${styles.actionButton} ${
@@ -271,9 +358,7 @@ export default function PostPage() {
               width="16"
               height="16"
               viewBox="0 0 24 24"
-              fill={
-                user && comment.likes.includes(user.uid) ? "#f91880" : "none"
-              }
+              fill={user && comment.likes.includes(user.uid) ? "#f91880" : "none"}
               stroke="#888"
               strokeWidth="2"
             >
@@ -381,7 +466,6 @@ export default function PostPage() {
                 <div key={reply.id} className={styles.reply}>
                   <div className={styles.replyHeader}>
                     <div className={styles.replyInfoWrapper}>
-      
                       {reply.userPhotoURL ? (
                         <Image
                           src={reply.userPhotoURL}
@@ -414,6 +498,7 @@ export default function PostPage() {
                           replyId: reply.id,
                         })
                       }
+                      onEdit={() => handleEditReply(comment.id, reply.id)}
                       onOptionClick={(option) =>
                         console.log(
                           `Selected ${option} for reply with ID: ${reply.id}`
@@ -421,13 +506,25 @@ export default function PostPage() {
                       }
                     />
                   </div>
-                  <div className={styles.replyContent}>{reply.content}</div>
+                  {editingReplyId?.replyId === reply.id && editingReplyId.commentId === comment.id ? (
+                    <form onSubmit={handleSubmitEdit(onSubmitEditReply)} className={styles.editForm}>
+                      <textarea
+                        {...registerEdit("content", { required: true })}
+                        className={styles.editInput}
+                        defaultValue={reply.content}
+                      />
+                      <div className={styles.editButtons}>
+                        <button type="submit" className={styles.editSubmit}>Save</button>
+                        <button type="button" onClick={onCancelEditReply} className={styles.editCancel}>Cancel</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className={styles.replyContent}>{reply.content}</div>
+                  )}
                   <div className={styles.replyActions}>
                     <button
                       className={`${styles.actionButton} ${
-                        user && reply.likes.includes(user.uid)
-                          ? styles.liked
-                          : ""
+                        user && reply.likes.includes(user.uid) ? styles.liked : ""
                       }`}
                       onClick={() => handleLikeReply(comment.id, reply.id)}
                     >
@@ -436,11 +533,7 @@ export default function PostPage() {
                         width="16"
                         height="16"
                         viewBox="0 0 24 24"
-                        fill={
-                          user && reply.likes.includes(user.uid)
-                            ? "#f91880"
-                            : "none"
-                        }
+                        fill={user && reply.likes.includes(user.uid) ? "#f91880" : "none"}
                         stroke="#888"
                         strokeWidth="2"
                       >
@@ -507,9 +600,7 @@ export default function PostPage() {
                   </div>
                   {replyingTo === reply.id && user && (
                     <form
-                      onSubmit={handleSubmit((data) =>
-                        onSubmitComment(data, reply.id)
-                      )}
+                      onSubmit={handleSubmit((data) => onSubmitComment(data, reply.id))}
                       className={styles.replyForm}
                     >
                       <div className={styles.replyInputWrapper}>
@@ -523,9 +614,7 @@ export default function PostPage() {
                           />
                         ) : (
                           <div className={styles.defaultReplyAvatar}>
-                            {user.displayName
-                              ? user.displayName.charAt(0)
-                              : "U"}
+                            {user.displayName ? user.displayName.charAt(0) : "U"}
                           </div>
                         )}
                         <input
@@ -702,13 +791,28 @@ export default function PostPage() {
               type="post"
               isOwner={user ? post.userId === user.uid : false}
               onDelete={() => setShowDeleteModal(true)}
+              onEdit={handleEditPost}
               onOptionClick={(option) =>
                 console.log(`Selected ${option} for post with ID: ${post.id}`)
               }
             />
           </div>
 
-          <div className={styles.postContent}>{post.content}</div>
+          {isEditingPost ? (
+            <form onSubmit={handleSubmitEdit(onSubmitEditPost)} className={styles.editForm}>
+              <textarea
+                {...registerEdit("content", { required: true })}
+                className={styles.editInput}
+                defaultValue={post.content}
+              />
+              <div className={styles.editButtons}>
+                <button type="submit" className={styles.editSubmit}>Save</button>
+                <button type="button" onClick={onCancelEditPost} className={styles.editCancel}>Cancel</button>
+              </div>
+            </form>
+          ) : (
+            <div className={styles.postContent}>{post.content}</div>
+          )}
 
           {post.imageUrl && (
             <div className={styles.postImage}>
@@ -735,9 +839,7 @@ export default function PostPage() {
                 width="20"
                 height="20"
                 viewBox="0 0 24 24"
-                fill={
-                  user && post.likes.includes(user.uid) ? "#f91880" : "none"
-                }
+                fill={user && post.likes.includes(user.uid) ? "#f91880" : "none"}
                 stroke="#888"
                 strokeWidth="2"
               >

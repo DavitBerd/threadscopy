@@ -1,0 +1,46 @@
+.rightSidebar {
+  padding: 20px;
+
+  @media (max-width: 992px) {
+    display: none;
+  }
+}
+
+.authCard {
+  position: static;
+  background-color: #121212;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  p {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .authButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+    background-color: transparent;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}

@@ -1,0 +1,256 @@
+.container {
+  min-height: 100vh;
+  background-color: #000;
+  color: #fff;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.main {
+  position: relative;
+  z-index: 1;
+}
+
+.main {
+  @media (max-width: 768px) {
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+}
+
+.main {
+  @media (max-width: 576px) {
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+}
+
+.searchHeader {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 500px;
+  background-color: #121212;
+  border: 1px solid #333;
+  border-radius: 20px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+  border-color: #555;
+}
+
+.searchInput::placeholder {
+  color: #888;
+}
+
+.searchInput {
+  @media (max-width: 768px) {
+    max-width: 100%;
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}
+
+.searchInput {
+  @media (max-width: 576px) {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+}
+
+.suggestions {
+  background-color: #121212;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+.suggestionsTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.suggestionsTitle {
+  @media (max-width: 768px) {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+}
+
+.suggestionsTitle {
+  @media (max-width: 576px) {
+    font-size: 14px;
+  }
+}
+
+.suggestionItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #222;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.suggestionItem:last-child {
+  border-bottom: none;
+}
+
+.suggestionItem:hover {
+  background-color: #1a1a1a;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatar {
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.avatar {
+  @media (max-width: 576px) {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.userInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.userName {
+  font-weight: 600;
+  font-size: 16px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userName {
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+}
+
+.userName {
+  @media (max-width: 576px) {
+    font-size: 13px;
+  }
+}
+
+.userOccupation,
+.userFollowers,
+.userBio {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userOccupation,
+.userFollowers,
+.userBio {
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
+}
+
+.userOccupation,
+.userFollowers,
+.userBio {
+  @media (max-width: 576px) {
+    font-size: 12px;
+  }
+}
+
+.followButton {
+  padding: 8px 16px;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.followButton:hover {
+  background-color: #ccc;
+}
+
+.followButton.following {
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+.followButton.following:hover {
+  background-color: #444;
+}
+
+.followButton {
+  @media (max-width: 768px) {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+.followButton {
+  @media (max-width: 576px) {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}
+
+.noResults {
+  text-align: center;
+  padding: 24px;
+  color: #888;
+  font-size: 16px;
+}
+
+.noResults {
+  @media (max-width: 768px) {
+    font-size: 14px;
+    padding: 16px;
+  }
+}
+
+.noResults {
+  @media (max-width: 576px) {
+    font-size: 13px;
+    padding: 12px;
+  }
+}
