@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -105,10 +105,36 @@ const Sidebar = ({ user }: SidebarProps) => {
   const [showPostModal, setShowPostModal] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const { addPost } = useStore();
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (showBottomMenu) {
+      const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as Element;
+        if (
+          !target.closest(`.${styles.bottomMenu}`) &&
+          !target.closest(`.${styles.menuButton}`)
+        ) {
+          setShowBottomMenu(false);
+        }
+      };
+
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }
+  }, [showBottomMenu]);
+
+  useEffect(() => {
+    setShowBottomMenu(false);
+  }, [pathname]);
 
   const UserAvatar = () => {
     if (user?.photoURL) {
@@ -174,12 +200,9 @@ const Sidebar = ({ user }: SidebarProps) => {
     [user, router]
   );
 
-  const toggleBottomMenu = useCallback(() => {
+  const toggleBottomMenu = useCallback((e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setShowBottomMenu((prev) => !prev);
-  }, []);
-
-  const closeBottomMenu = useCallback(() => {
-    setShowBottomMenu(false);
   }, []);
 
   const closeLoginPrompt = useCallback(() => {
@@ -222,6 +245,10 @@ const Sidebar = ({ user }: SidebarProps) => {
     );
   };
 
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <>
       <div className={styles.sidebar}>
@@ -258,12 +285,14 @@ const Sidebar = ({ user }: SidebarProps) => {
             <UserAvatar />
           </NavItem>
         </nav>
-
-        <div className={styles.bottomSection}>
-          <button className={styles.menuButton} onClick={toggleBottomMenu}>
-            <MenuIcon />
-          </button>
-        </div>
+        <button
+          className={styles.menuButton}
+          onClick={toggleBottomMenu}
+          type="button"
+        >
+          <MenuIcon />
+        </button>
+ 
       </div>
 
       <div className={styles.topBar}>
@@ -274,6 +303,7 @@ const Sidebar = ({ user }: SidebarProps) => {
           <button
             className={styles.loginButton}
             onClick={() => router.push("/pages/login")}
+            type="button"
           >
             Log in
           </button>
@@ -313,7 +343,7 @@ const Sidebar = ({ user }: SidebarProps) => {
       </nav>
 
       {showBottomMenu && (
-        <div className={styles.bottomMenuOverlay} onClick={closeBottomMenu}>
+        <div className={styles.bottomMenuOverlay}>
           <div
             className={styles.bottomMenu}
             onClick={(e) => e.stopPropagation()}
@@ -351,6 +381,7 @@ const Sidebar = ({ user }: SidebarProps) => {
                 className={styles.logoutMenuItem}
                 onClick={handleLogout}
                 disabled={isLoading}
+                type="button"
               >
                 {isLoading && <div className={styles.spinner} />}
                 <span>Log out</span>
