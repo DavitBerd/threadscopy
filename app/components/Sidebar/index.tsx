@@ -251,6 +251,29 @@ const Sidebar = ({ user }: SidebarProps) => {
 
   return (
     <>
+      <div className={styles.topBar}>
+        <div className={styles.logos}>
+          <Link href="/">Threads</Link>
+        </div>
+        {user ? (
+          <button
+            className={styles.topMenuButton}
+            onClick={toggleBottomMenu}
+            type="button"
+          >
+            <MenuIcon />
+          </button>
+        ) : (
+          <button
+            className={styles.loginButton}
+            onClick={() => router.push("/pages/login")}
+            type="button"
+          >
+            Log in
+          </button>
+        )}
+      </div>
+
       <div className={styles.sidebar}>
         <div className={styles.logo}>
           <Link href="/" className={styles.sidelogo}>
@@ -292,55 +315,7 @@ const Sidebar = ({ user }: SidebarProps) => {
         >
           <MenuIcon />
         </button>
- 
       </div>
-
-      <div className={styles.topBar}>
-        <div className={styles.logo}>
-          <Link href="/">Threads</Link>
-        </div>
-        {!user && (
-          <button
-            className={styles.loginButton}
-            onClick={() => router.push("/pages/login")}
-            type="button"
-          >
-            Log in
-          </button>
-        )}
-      </div>
-
-      <nav className={styles.bottomNav}>
-        <NavItem href="/" isActive={pathname === "/"}>
-          <HomeIcon />
-        </NavItem>
-
-        <NavItem href="/pages/search" isActive={pathname === "/pages/search"}>
-          <SearchIcon />
-        </NavItem>
-
-        <NavItem onClick={() => handleProtectedAction("post")}>
-          <PlusIcon />
-        </NavItem>
-
-        <NavItem
-          isActive={pathname === "/notifications"}
-          onClick={() => handleProtectedAction("notifications")}
-        >
-          <HeartIcon />
-        </NavItem>
-
-        <NavItem
-          isActive={pathname.startsWith("/profile")}
-          onClick={() => handleProtectedAction("profile")}
-        >
-          <UserAvatar />
-        </NavItem>
-
-        <NavItem onClick={toggleBottomMenu}>
-          <MenuIcon />
-        </NavItem>
-      </nav>
 
       {showBottomMenu && (
         <div className={styles.bottomMenuOverlay}>
