@@ -7,6 +7,7 @@
   color: #ffffff;
   font-family: "Helvetica Neue", sans-serif;
   flex-direction: column;
+  gap: 200px;
 }
 
 .registerBox {
@@ -15,6 +16,7 @@
   text-align: center;
   max-width: 400px;
   width: 100%;
+  padding: 20px;
 }
 
 .heading {
@@ -72,5 +74,113 @@
     &:hover {
       text-decoration: underline;
     }
+  }
+}
+
+.footer {
+  position: relative;
+  width: 100%;
+  margin-top: 10px;
+  font-size: 11px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  a {
+    color: #888;
+    text-decoration: underline;
+    margin: 0 4px;
+  }
+  .qrSection {
+    right: 5%;
+    bottom: 5%;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #aaa;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    .qrcode {
+      &:hover {
+        scale: 1.2;
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .registerBox {
+    padding: 15px;
+  }
+  .heading {
+    font-size: 20px;
+  }
+  .input {
+    font-size: 16px;
+    padding: 14px;
+  }
+  .error {
+    font-size: 14px;
+  }
+  .loginLink {
+    font-size: 14px;
+  }
+  .form {
+    gap: 16px;
+  }
+  .registerButton {
+    padding: 14px;
+  }
+  .footer {
+    font-size: 12px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+    a {
+      font-size: 12px;
+      padding: 5px;
+      display: inline-block;
+    }
+    .qrSection {
+      display: none;
+    }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .registerBox {
+    max-width: 500px;
+    padding: 20px;
+  }
+  .heading {
+    font-size: 22px;
+  }
+  .input {
+    font-size: 16px;
+    padding: 14px;
+  }
+  .registerButton {
+    padding: 14px;
+  }
+  .footer {
+    font-size: 12px;
+    margin-top: 10px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .registerBox {
+    max-width: 400px;
+  }
+  .footer {
+    .qrSection {
+      display: flex;
+    }
+  }
+}
+@media (max-width: 586px) {
+  .container {
+    gap: 20px;
   }
 }

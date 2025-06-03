@@ -9,6 +9,7 @@ import styles from "./Register.module.scss";
 import Link from "next/link";
 import { useState } from "react";
 import LoginPopup from "@/app/components/LoginPopup";
+import { QRCodeCanvas } from "qrcode.react";
 
 interface FormData {
   email: string;
@@ -18,8 +19,7 @@ interface FormData {
 const errorMessages: Record<string, string> = {
   "auth/email-already-in-use": "An account with this email already exists.",
   "auth/invalid-email": "Please enter a valid email address.",
-  "auth/weak-password":
-    "Password is too weak. It must be at least 6 characters.",
+  "auth/weak-password": "Password is too weak. It must be at least 6 characters.",
   "auth/too-many-requests": "Too many attempts. Please try again later.",
   "auth/network-request-failed": "Network error. Please check your connection.",
   default: "An unexpected error occurred. Please try again.",
@@ -103,6 +103,21 @@ const Register = () => {
           Already have an account? <Link href="/pages/login">Log in</Link>
         </div>
       </div>
+
+      <footer className={styles.footer}>
+        <p>
+          © 2025 Threads | <a href="#">Terms</a> | <a href="#">Privacy Policy</a> |{" "}
+          <a href="#">Cookies Policy</a> | <a href="#">Report a problem</a>
+        </p>
+        <div className={styles.qrSection}>
+          <p>Scan to get the app</p>
+          <QRCodeCanvas
+            value="https://www.threads.net/download/redirect"
+            size={100}
+            className={styles.qrcode}
+          />
+        </div>
+      </footer>
 
       <LoginPopup
         isOpen={showPopup}
