@@ -234,7 +234,7 @@ const Post = ({ post, user, updatePost }: PostProps) => {
             <span>{post.likes.length}</span>
           </button>
 
-          <Link href={`/posts/${post.id}`}>
+          <Link href={`/pages/posts/${post.id}`}>
             <button className={styles.actionButton}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
